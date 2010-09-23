@@ -32,7 +32,7 @@ static void enable_paging(void* page_directory) {
 }
 
 void set_pages(void) {
-  unsigned int *page_directory = (unsigned int*) 0x9C000;
+  unsigned int *page_directory = (unsigned int*) 0x1c000;
   puts("a");
   for (unsigned i = 0; i < 1024; i++)
     {
