@@ -9,9 +9,12 @@ void kmain( void* mbd, unsigned int magic )
 
   clear_screen();
   puts("Korfuri\nOcian\nKernel 0.0.0.0.0.0.0.0.1");
-  for (unsigned int j = 0;; j++) {
-    putnbr16(j);
-    puts("a");
-    for (unsigned int i = 0; i < 20000000; i++);
-  }
+  puts("Is paging enabled (0 = yes) ?");
+  putnbr(is_paging_enabled());
+  putchar('\n');
+  set_pages();
+  puts("Paging should be enabled !");
+  puts("Is paging enabled (0 = yes) ?");
+  putnbr(is_paging_enabled());
+  putchar('\n');
 }

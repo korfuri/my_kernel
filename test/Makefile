@@ -1,5 +1,5 @@
-CFLAGS= -W -Wall -std=c99 -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -I.
-OBJECTS= loader.o kernel.o libC.o tty.o
+CFLAGS= -W -Wall -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -I. -std=gnu99
+OBJECTS= loader.o kernel.o libC.o tty.o paging.o
 M= Makefile
 LS= linker.ld
 GRUBDIR=.

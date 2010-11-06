@@ -14,7 +14,7 @@ void puts(char* str) {
   putchar('\n');
 }
 
-static void putnbr_r(int n) {
+static void putnbr_r(unsigned int n) {
   if (n > 9)
     putnbr_r(n / 10);
   putchar('0' + (n % 10));
@@ -29,7 +29,7 @@ void putnbr(int n) {
   }
 }
 
-static void putnbr16_r(int n) {
+static void putnbr16_r(unsigned int n) {
   if (n > 15)
     putnbr16_r(n / 16);
   if (n % 16 < 10)
@@ -38,15 +38,10 @@ static void putnbr16_r(int n) {
     putchar('A' - 10 + (n % 16));
 }
 
-void putnbr16(int n) {
+void putnbr16(unsigned int n) {
   putchar('0');
   putchar('x');
-  if (n < 0) {
-    putchar('-');
-    putnbr16_r(-n);
-  } else {
-    putnbr16_r(n);
-  }
+  putnbr16_r(n);
 }
 
 void clear_screen(void) {
