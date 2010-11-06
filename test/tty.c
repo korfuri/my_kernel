@@ -14,6 +14,41 @@ void puts(char* str) {
   putchar('\n');
 }
 
+static void putnbr_r(int n) {
+  if (n > 9)
+    putnbr_r(n / 10);
+  putchar('0' + (n % 10));
+}
+
+void putnbr(int n) {
+  if (n < 0) {
+    putchar('-');
+    putnbr_r(-n);
+  } else {
+    putnbr_r(n);
+  }
+}
+
+static void putnbr16_r(int n) {
+  if (n > 15)
+    putnbr16_r(n / 16);
+  if (n % 16 < 10)
+    putchar('0' + (n % 16));
+  else
+    putchar('A' - 10 + (n % 16));
+}
+
+void putnbr16(int n) {
+  putchar('0');
+  putchar('x');
+  if (n < 0) {
+    putchar('-');
+    putnbr16_r(-n);
+  } else {
+    putnbr16_r(n);
+  }
+}
+
 void clear_screen(void) {
   // Resets the whole screen to zero
   memset(vram, 0, COLS * LINES * 2);
