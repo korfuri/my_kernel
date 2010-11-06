@@ -13,8 +13,4 @@ void kmain( void* mbd, unsigned int magic )
     puts("a");
     for (unsigned int i = 0; i < 20000000; i++);
   }
-  /* puts("a"); */
-  /* puts("a"); */
-  /* puts("a"); */
-
 }
