@@ -6,16 +6,15 @@ void kmain( void* mbd, unsigned int magic )
       /* message and halt, but do *not* rely on the multiboot */
       /* data structure. */
     }
- 
-  /* You could either use multiboot.h */
-  /* (http://www.gnu.org/software/grub/manual/multiboot/multiboot.html#multiboot_002eh) */
-  /* or do your offsets yourself. The following is merely an example. */ 
-  char * boot_loader_name =(char*) ((long*)mbd)[16];
- 
-  /* Print a letter to screen to see everything is working: */
-  unsigned char *videoram = (unsigned char *) 0xb8000;
-  videoram[0] = 66; /* character 'A' */
-  videoram[1] = 0x07; /* forground, background color. */
- 
-  /* Write your kernel here. */
+
+  clear_screen();
+  puts("Korfuri\nOcian\nKernel 0.0.0.0.0.0.0.0.1");
+  for (;;) {
+    puts("a");
+    for (unsigned int i = 0; i < 20000000; i++);
+  }
+  /* puts("a"); */
+  /* puts("a"); */
+  /* puts("a"); */
+
 }

@@ -1,4 +1,5 @@
-OBJECTS= loader.o kernel.o
+CFLAGS= -W -Wall -std=c99 -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -I.
+OBJECTS= loader.o kernel.o libC.o
 M= Makefile
 LS= linker.ld
 GRUBDIR=.
@@ -8,7 +9,7 @@ PADSIZE=750
 	nasm -f elf -o $@ $<
 
 .c.o: $< $(M)
-	gcc -W -Wall -std=c99 -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -o $@ -c $<
+	gcc $(CFLAGS) -o $@ -c $<
 
 kernel.bin: $(OBJECTS) $(M) $(LS)
 	ld -T $(LS) -o $@ $(OBJECTS)
