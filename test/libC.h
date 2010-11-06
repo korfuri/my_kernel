@@ -3,7 +3,6 @@
 
 typedef unsigned int size_t;
 
-void putchar(char c);
 void* memcpy(void* dest, void* src, size_t size);
 void* memset(void* memory, unsigned char c, size_t size);
 
