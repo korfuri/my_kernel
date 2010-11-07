@@ -1,3 +1,7 @@
+#include <tty.h>
+#include <libC.h>
+#include <paging.h>
+
 void kmain( void* mbd, unsigned int magic )
 {
   if ( magic != 0x2BADB002 )

@@ -4,4 +4,6 @@
 // Returns 0 if paging is enabled, 1 otherwise
 int is_paging_enabled(void);
 
+void set_pages(void);
+
 #endif

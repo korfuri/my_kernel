@@ -26,4 +26,9 @@ test: boot.img
 fclean:
 	rm -f $(OBJECTS) kernel.bin boot.img pad
 
-.PHONY: fclean test
+all: boot.img
+
+re: fclean all
+
+.PHONY: fclean test all re
+.DEFAULT: all
