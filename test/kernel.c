@@ -13,6 +13,11 @@ void kmain( void* mbd, unsigned int magic )
 
   clear_screen();
   puts("Korfuri\nOcian\nKernel 0.0.0.0.0.0.0.0.1");
+
+  puts("Boot from Multiboot :");
+  puts(((long*)mbd)[16]);
+
+  
   puts("Is paging enabled (0 = yes) ?");
   putnbr(is_paging_enabled());
   putchar('\n');
