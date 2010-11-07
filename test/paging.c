@@ -40,12 +40,15 @@ void set_pages(void) {
   unsigned int i;
   
   //we will fill all 1024 entries, mapping 4 megabytes
-  for(i = 0; i < 1024; i++)
+  for(i = 0; i < 1022; i++)
     {
       first_page_table[i] = address | 3; // attributes: supervisor level, read/write, present.
       address = address + 4096; //advance the address to the next page boundary
     }
 
+  first_page_table[i++] = 0x1000000 | 3; // attributes: supervisor level, read/write, present.
+  first_page_table[i++] = 0x1000000 | 3; // attributes: supervisor level, read/write, present.
+  
   page_directory[0] = first_page_table; 
   page_directory[0] |= 3;// attributes: supervisor level, read/write, present
 

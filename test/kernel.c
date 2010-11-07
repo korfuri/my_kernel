@@ -21,4 +21,7 @@ void kmain( void* mbd, unsigned int magic )
   puts("Is paging enabled (0 = yes) ?");
   putnbr(is_paging_enabled());
   putchar('\n');
+
+  memcpy(0x3FE000, "coucou les amis", sizeof("coucou les amis"));
+  puts(0x3FF000);
 }
