@@ -69,11 +69,9 @@ static intptr_t rmm_allocate_page_in_chunk(unsigned int chunkID) {
 intptr_t rmm_allocate_page(void) {
   for (unsigned int i = rmm_min_physical_addr() / CHUNK_SIZE; i < 1024; i++) {
     if (rmm_info.pagetabs[i].free_pages_count > 0) {
-      puts("Found chunk");
       return rmm_allocate_page_in_chunk(i);
     }
     else if (rmm_info.pagetabs[i].pages == NULL) {
-      puts("New chunk");
       rmm_allocate_pagetabinfo(i * 4096 * 1024, &(rmm_info.pagetabs[i]));
       return rmm_allocate_page_in_chunk(i);
     }

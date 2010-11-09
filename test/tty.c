@@ -4,7 +4,7 @@
 #define COLS 80
 #define LINES 25
 
-static unsigned char* const vram = (char*)0xb8000;
+static unsigned char* const vram = (unsigned char*)0xb8000;
 static size_t vram_offset = 0;
 
 void puts(char* str) {
@@ -61,6 +61,7 @@ void putchar(char c) {
   // Scrolls one line from the screen
   if (vram_offset > (LINES - 1) * COLS * 2) {
     memcpy(vram, vram + COLS * 2, (LINES - 1) * COLS * 2);
+    vram[(LINES - 1) * COLS * 2] = ' ';
     vram_offset -= COLS * 2;
   }
 }
