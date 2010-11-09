@@ -8,6 +8,7 @@
 #define RMM_H_
 
 #include <libC.h>
+#include <paging.h> // For PAGE_SIZE
 
 /*
 ** Information about a 4k chunk, in physical memory
@@ -34,5 +35,7 @@ struct rmm_internal {
 
 void	rmm_init(void);
 intptr_t rmm_allocate_page(void);
+
+#define CHUNK_SIZE (1024 * PAGE_SIZE)
 
 #endif

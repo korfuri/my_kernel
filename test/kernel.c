@@ -1,6 +1,8 @@
 #include <tty.h>
 #include <libC.h>
 #include <paging.h>
+#include <rmm.h>
+#include <panic.h>
 
 void kmain( void* mbd, unsigned int magic )
 {
@@ -18,15 +20,23 @@ void kmain( void* mbd, unsigned int magic )
   puts(((long*)mbd)[16]);
 
   
-  puts("Is paging enabled (0 = yes) ?");
-  putnbr(is_paging_enabled());
-  putchar('\n');
-  set_pages();
-  puts("Paging should be enabled !");
-  puts("Is paging enabled (0 = yes) ?");
-  putnbr(is_paging_enabled());
-  putchar('\n');
+  /* puts("Is paging enabled (0 = yes) ?"); */
+  /* putnbr(is_paging_enabled()); */
+  /* putchar('\n'); */
+  /* set_pages(); */
+  /* puts("Paging should be enabled !"); */
+  /* puts("Is paging enabled (0 = yes) ?"); */
+  /* putnbr(is_paging_enabled()); */
+  /* putchar('\n'); */
 
-  memcpy(0x3FE000, "coucou les amis", sizeof("coucou les amis"));
-  puts(0x3FF000);
+  /* memcpy(0x3FE000, "coucou les amis", sizeof("coucou les amis")); */
+  /* puts(0x3FF000); */
+
+  rmm_init();
+  for (;;) {
+    putnbr16(rmm_allocate_page());
+    puts("");
+  }
+  
+  panic("End of kmain()");
 }

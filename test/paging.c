@@ -49,7 +49,7 @@ void set_pages(void) {
   first_page_table[i++] = 0x1000000 | 3; // attributes: supervisor level, read/write, present.
   first_page_table[i++] = 0x1000000 | 3; // attributes: supervisor level, read/write, present.
   
-  page_directory[0] = first_page_table; 
+  page_directory[0] = (void*)first_page_table; 
   page_directory[0] |= 3;// attributes: supervisor level, read/write, present
 
   enable_paging(page_directory);

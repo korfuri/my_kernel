@@ -4,7 +4,7 @@
 #define COLS 80
 #define LINES 25
 
-static unsigned char* const vram = 0xb8000;
+static unsigned char* const vram = (char*)0xb8000;
 static size_t vram_offset = 0;
 
 void puts(char* str) {
