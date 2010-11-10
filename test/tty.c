@@ -8,11 +8,22 @@ static unsigned char* const vram = (unsigned char*)0xb8000;
 static size_t vram_offset = 0;
 
 void puts(char* str) {
+  putstr(str);
+  putchar('\n');
+}
+
+void putstr(char* str) {
   for (unsigned int i = 0; str[i]; i++) {
     putchar(str[i]);
   }
-  putchar('\n');
 }
+
+void putstrn(char* str, size_t s) {
+  for (size_t i = 0; i < s; i++) {
+    putchar(str[i]);
+  }
+}
+
 
 static void putnbr_r(unsigned int n) {
   if (n > 9)

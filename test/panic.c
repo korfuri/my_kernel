@@ -3,24 +3,36 @@
 #include <libC.h>
 
 void backtrace(void) {
-  intptr_t eip;
-  intptr_t ebp;
+  intptr_t eip = 0;
+  intptr_t ebp = 0;
+  unsigned int i = 0;
   
   asm volatile("mov %%ebp, %0": "=b"(ebp));
 
-  for (;;) {
-    eip = *(intptr_t*)(ebp + 12);
-    ebp = *(intptr_t*)(ebp + 8);
+  while (i++ < MAX_BACKTRACE_DEPTH) {
+    eip = *(intptr_t*)(ebp + 4);
+    ebp = *(intptr_t*)(ebp);
 
+    if (ebp == 0 || eip == 0)
+      break;
+
+    size_t diff;
+    char* symname = elf_get_sym_name_before(eip, &diff);
+    
     putnbr16(eip);
     puts(" - eip");
+    putnbr16(symname);
+    puts(symname);
+    puts(" + ");
+    putnbr16(diff);
+    
+    /* putnbr16(ebp); */
+    /* puts(" - ebp"); */
 
-    putnbr16(ebp);
-    puts(" - ebp");
+    puts("");
 
-    puts("=====");
-    for (unsigned int i = 0; i < 200000000; i++);
-  } 
+  }
+  puts("End of backtrace");
 }
 
 void kmain();
@@ -28,8 +40,6 @@ void kmain();
 void panic(char* error_msg) {
   puts("");
   puts("======= PANIC =======");
-  putnbr16(kmain);
-  putnbr16(panic);
   puts(error_msg);
   backtrace();
   for (;;);

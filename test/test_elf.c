@@ -1,23 +1,40 @@
 #include <elf.h>
 #include <tty.h>
+#define HAS_INTPTR_T
+#include <libC.h>
+
+static char* shtrtab = NULL;
+static char* strtab = NULL;
+static Elf32_Sym* symtab = NULL;
+static unsigned int symcount = 0;
 
 void test_elf(Elf32_Shdr* shdr, unsigned int num, unsigned int shstrndx) {
-  char* strings = shdr[shstrndx].sh_addr;
-  
-  puts("Nb sections : ");
-  putnbr(num);
+  shtrtab = shdr[shstrndx].sh_addr;
+
   for (unsigned int i = 0; i < num; i++) {
-    puts("\n\n== Section ==");
-    
-    putnbr(shdr[i].sh_name);
-    puts(" - name (offset)");
-    
-    puts(strings + shdr[i].sh_name);
-    
-    putnbr(i);
-    puts(" - num");
-    
-    putnbr16(shdr[i].sh_addr);
-    puts(" - addr");
+    if (!strcmp(shtrtab + shdr[i].sh_name, ".symtab")) {
+      symtab = shdr[i].sh_addr;
+      symcount = shdr[i].sh_size / sizeof(Elf32_Shdr);
+    } else if (!strcmp(shtrtab + shdr[i].sh_name, ".strtab")) {
+      strtab = shdr[i].sh_addr;
+    }
+    puts(shtrtab + shdr[i].sh_name);
   }
+}
+
+char* elf_get_sym_name_before(intptr_t eip, size_t* diff) {
+  intptr_t	best_value = 0;
+  char*		best_string = "<unknown>";
+  
+  for (unsigned int i = 0; i < symcount; i++) {
+    if (eip >= symtab[i].st_value && (symtab[i].st_info | STT_FUNC)) {
+      if (symtab[i].st_value > best_value) {
+	best_value = symtab[i].st_value;
+	best_string = strtab + symtab[i].st_name;
+      }
+    }
+  }
+  if (diff)
+    *diff = eip - best_value;
+  return best_string;
 }
