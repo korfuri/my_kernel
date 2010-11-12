@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <tty.h>
 #include <libC.h>
 
@@ -74,5 +75,37 @@ void putchar(char c) {
     memcpy(vram, vram + COLS * 2, (LINES - 1) * COLS * 2);
     vram[(LINES - 1) * COLS * 2] = ' ';
     vram_offset -= COLS * 2;
+  }
+}
+
+void printf(char* format, ...) {
+  va_list arg;
+  
+  va_start(arg, format);
+  for (size_t i = 0; format[i] != '\0'; i++) {
+    if (format[i] == '%') {
+      i++;
+      switch (format[i]) {
+      case 's':
+	putstr(va_arg(arg, char*));
+	break;
+      case 'i':
+      case 'd':
+	putnbr(va_arg(arg, int));
+      break;
+      case 'x':
+      case 'X':
+      case 'p':
+	putnbr16(va_arg(arg, unsigned int));
+      break;
+      case '\0':
+      default:
+	i--;
+      case '%':
+	putchar('%');
+      }
+    } else {
+      putchar(format[i]);
+    }
   }
 }

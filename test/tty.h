@@ -10,5 +10,6 @@ void putstr(char* str);
 void putstrn(char* str, size_t s);
 void putnbr16(unsigned int n);
 void putnbr(int n);
+void printf(char* format, ...);
 
 #endif
