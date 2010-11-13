@@ -4,8 +4,8 @@
 #include <elfkernel.h>
 
 void backtrace(void) {
-  intptr_t eip = 0;
-  intptr_t ebp = 0;
+  uintptr_t eip = 0;
+  uintptr_t ebp = 0;
   unsigned int i = 0;
   size_t diff;
   char* symname;
@@ -13,8 +13,8 @@ void backtrace(void) {
   asm volatile("mov %%ebp, %0": "=b"(ebp));
 
   while (i++ < MAX_BACKTRACE_DEPTH) {
-    eip = *(intptr_t*)(ebp + 4);
-    ebp = *(intptr_t*)(ebp);
+    eip = *(uintptr_t*)(ebp + 4);
+    ebp = *(uintptr_t*)(ebp);
     if (ebp == 0 || eip == 0)
       break;
 

@@ -1,5 +1,5 @@
 #include <elf.h>
-#define HAS_INTPTR_T
+#define HAS_UINTPTR_T
 
 #include <elfkernel.h>
 #include <tty.h>
@@ -24,13 +24,13 @@ void elf_init(void* vshdr, unsigned int num, unsigned int shstrndx) {
   }
 }
 
-char* elf_get_sym_name_before(intptr_t eip, size_t* diff) {
-  intptr_t	best_value = 0;
+char* elf_get_sym_name_before(uintptr_t eip, size_t* diff) {
+  uintptr_t	best_value = 0;
   char*		best_string = "<unknown>";
   
   for (unsigned int i = 0; i < symcount; i++) {
-    if (eip >= (intptr_t)symtab[i].st_value) { // && (symtab[i].st_info & STT_FUNC)) {
-      if ((intptr_t)symtab[i].st_value > best_value) {
+    if (eip >= (uintptr_t)symtab[i].st_value) { // && (symtab[i].st_info & STT_FUNC)) {
+      if ((uintptr_t)symtab[i].st_value > best_value) {
 	best_value = symtab[i].st_value;
 	if (symtab[i].st_name > 0)
 	  best_string = strtab + symtab[i].st_name;

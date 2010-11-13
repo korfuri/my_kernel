@@ -34,7 +34,7 @@ struct rmm_internal {
 };
 
 void	rmm_init(void);
-intptr_t rmm_allocate_page(void);
+uintptr_t rmm_allocate_page(void);
 
 #define CHUNK_SIZE (1024 * PAGE_SIZE)
 

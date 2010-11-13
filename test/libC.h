@@ -5,8 +5,8 @@ typedef unsigned int uint32_t;
 typedef unsigned short int uint16_t;
 
 typedef unsigned int size_t;
-#ifndef HAS_INTPTR_T
-typedef unsigned int intptr_t;
+#ifndef HAS_UINTPTR_T
+typedef unsigned int uintptr_t;
 #endif
 
 #define NULL ((void*)0)
