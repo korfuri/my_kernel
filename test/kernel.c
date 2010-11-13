@@ -17,10 +17,7 @@ void kmain(struct multiboot_info* mbi, unsigned int magic )
   elf_init((void*)mbi->u.elf_sec.addr, mbi->u.elf_sec.num, mbi->u.elf_sec.shndx);
   rmm_init();
   
-  puts("Korfuri\nOcian\nKernel 0.0.0.0.0.0.0.0.1");
-  puts("Boot from Multiboot :");
-  puts((char*)mbi->boot_loader_name);
-
+  puts("           Booting my_kernel");
   
   /* puts("Is paging enabled (0 = yes) ?"); */
   /* putnbr(is_paging_enabled()); */

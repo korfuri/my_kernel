@@ -21,7 +21,6 @@ void elf_init(void* vshdr, unsigned int num, unsigned int shstrndx) {
     } else if (!strcmp(shtrtab + shdr[i].sh_name, ".strtab")) {
       strtab = (char*)(shdr[i].sh_addr);
     }
-    puts(shtrtab + shdr[i].sh_name);
   }
 }
 
