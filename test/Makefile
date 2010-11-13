@@ -1,5 +1,5 @@
 CFLAGS= -W -Wall -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -I. -std=gnu99
-OBJECTS= loader.o kernel.o libC.o tty.o paging.o rmm.o panic.o test_elf.o
+OBJECTS= loader.o kernel.o libC.o tty.o paging.o rmm.o panic.o elfkernel.o
 M= Makefile
 LS= linker.ld
 GRUBDIR=.

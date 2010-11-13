@@ -4,6 +4,7 @@
 #include <rmm.h>
 #include <panic.h>
 #include <multiboot.h>
+#include <elfkernel.h>
 
 void kmain(struct multiboot_info* mbi, unsigned int magic )
 {
@@ -13,10 +14,12 @@ void kmain(struct multiboot_info* mbi, unsigned int magic )
     }
   
   clear_screen();
+  elf_init((void*)mbi->u.elf_sec.addr, mbi->u.elf_sec.num, mbi->u.elf_sec.shndx);
+  rmm_init();
+  
   puts("Korfuri\nOcian\nKernel 0.0.0.0.0.0.0.0.1");
-
   puts("Boot from Multiboot :");
-  puts(mbi->boot_loader_name);
+  puts((char*)mbi->boot_loader_name);
 
   
   /* puts("Is paging enabled (0 = yes) ?"); */
@@ -37,6 +40,6 @@ void kmain(struct multiboot_info* mbi, unsigned int magic )
   /*   puts(""); */
   /* } */
 
-  test_elf(mbi->u.elf_sec.addr, mbi->u.elf_sec.num, mbi->u.elf_sec.shndx);
+
   panic("End of kmain()");
 }

@@ -1,6 +1,7 @@
 #include <panic.h>
 #include <tty.h>
 #include <libC.h>
+#include <elfkernel.h>
 
 void backtrace(void) {
   intptr_t eip = 0;
