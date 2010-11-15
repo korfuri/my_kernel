@@ -18,6 +18,20 @@ uintptr_t rmm_max_physical_addr(void) {
   return rmm_gl_max_physical_addr;
 }
 
+uintptr_t rmm_allocate_chunk(void) {
+  for (uint32_t chunkID = 0; chunkID < 1024; chunkID++) {
+    if (rmm_gl_metadata_addr->chunk[chunkID].free_pages_count == 1024) {
+      for (uint32_t pageID = chunkID * 1024; pageID < (chunkID + 1) * 1024; pageID++) {
+	rmm_gl_metadata_addr->page[pageID].ref_count = 1;
+      }
+      rmm_gl_metadata_addr->chunk[chunkID].free_pages_count = 0;
+      return chunkID * 1024 * 4096;
+    }
+  }
+  panic("No physical memory available");
+  return 0;  
+}
+
 uintptr_t rmm_allocate_page(void) {
   for (uint32_t chunkID = 0; chunkID < 1024; chunkID++) {
     if (rmm_gl_metadata_addr->chunk[chunkID].free_pages_count > 0) {
@@ -37,9 +51,22 @@ uintptr_t rmm_allocate_page(void) {
 
 void rmm_reclaim_page(uintptr_t page) {
   uint32_t pageID = page / 4096;
+
   rmm_gl_metadata_addr->page[pageID].ref_count--;
   if (rmm_gl_metadata_addr->page[pageID].ref_count == 0)
     rmm_gl_metadata_addr->chunk[pageID / 1024].free_pages_count++;
+}
+
+void rmm_reclaim_chunk(uintptr_t chunk) {
+  uint32_t chunkID = page / (1024 * 4096);
+
+  if (rmm_gl_metadata_addr->chunk[chunkID].free_pages_count != 0)
+    panic("rmm_reclaim_chunk called on a non-totally-free chunk");
+  for (uint32_t pageID = chunkID * 1024; pageID < (chunkID + 1) * 1024; pageID++) {
+    rmm_gl_metadata_addr->page[pageID].ref_count--;
+    if (rmm_gl_metadata_addr->page[pageID].ref_count == 0)
+      rmm_gl_metadata_addr->chunk[chunkID].free_pages_count++;
+  }
 }
 
 size_t	rmm_init(struct multiboot_info* mbi) {

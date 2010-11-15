@@ -28,8 +28,7 @@ void backtrace(void) {
 void kmain();
 
 void panic(char* error_msg) {
-  puts("");
-  puts("======= PANIC =======");
+  puts("\n======= PANIC =======");
   puts(error_msg);
   backtrace();
   for (;;);
