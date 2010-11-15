@@ -1,4 +1,6 @@
 #include <paging.h>
+#include <rmm.h>
+#include <tty.h>
 
 int is_paging_enabled(void) {
   unsigned int cr0;
@@ -22,35 +24,70 @@ static void enable_paging(void* page_directory) {
   asm volatile("mov %0, %%cr0":: "b"(cr0));
 }
 
-void set_pages(void) {
-  unsigned int *page_directory = (unsigned int*) 0x1c000;
+void set_first_pages(void) {
+  unsigned int *page_directory = (unsigned int*)rmm_allocate_page();
+  unsigned int *first_page_table = (unsigned int*)rmm_allocate_page();
+  unsigned int *second_page_table = (unsigned int*)rmm_allocate_page();
+  unsigned int *third_page_table = (unsigned int*)rmm_get_rmmpage();
 
+  printf("pde = %p\npte0 = %p\npte1 = %p\n", page_directory, first_page_table, second_page_table);
+  
   for (unsigned i = 0; i < 1024; i++)
     {
-      //attribute: supervisor level, read/write, not present.
-      page_directory[i] = 0 | 2; 
+      page_directory[i] =
+	PAGING_PDE_LEVEL_SUPERVISOR |
+	PAGING_PDE_PRESENT_FALSE |
+	PAGING_PDE_ACCESS_RW;
     }
-
-  //our first page table comes right after the page directory
-  unsigned int *first_page_table = page_directory + 0x1000;
 
   // holds the physical address where we want to start mapping these pages to.
   // in this case, we want to map these pages to the very beginning of memory.
-  unsigned int address = 0; 
+  unsigned int address = 0;
   unsigned int i;
   
   //we will fill all 1024 entries, mapping 4 megabytes
-  for(i = 0; i < 1022; i++)
+  for(i = 0; i < 1024; i++)
     {
-      first_page_table[i] = address | 3; // attributes: supervisor level, read/write, present.
+      first_page_table[i] = address |
+	PAGING_PTE_LEVEL_SUPERVISOR |
+	PAGING_PTE_ACCESS_RW |
+	PAGING_PTE_PRESENT_TRUE |
+	PAGING_PTE_GLOBAL_TRUE;
       address = address + 4096; //advance the address to the next page boundary
     }
 
-  first_page_table[i++] = 0x1000000 | 3; // attributes: supervisor level, read/write, present.
-  first_page_table[i++] = 0x1000000 | 3; // attributes: supervisor level, read/write, present.
+  second_page_table[0] = (unsigned int)page_directory |
+    PAGING_PTE_PRESENT_TRUE |
+    PAGING_PTE_ACCESS_RW |
+    PAGING_PTE_LEVEL_SUPERVISOR;
+
+  second_page_table[1] = (unsigned int)first_page_table |
+    PAGING_PTE_PRESENT_TRUE |
+    PAGING_PTE_ACCESS_RW |
+    PAGING_PTE_LEVEL_SUPERVISOR;
   
-  page_directory[0] = (unsigned int)first_page_table; 
-  page_directory[0] |= 3;// attributes: supervisor level, read/write, present
+  second_page_table[2] = (unsigned int)second_page_table |
+    PAGING_PTE_PRESENT_TRUE |
+    PAGING_PTE_ACCESS_RW |
+    PAGING_PTE_LEVEL_SUPERVISOR;
+  
+  for(i = 3; i < 1024; i++)
+    {
+      second_page_table[i] =
+	PAGING_PTE_PRESENT_FALSE |
+	PAGING_PTE_ACCESS_RW |
+	PAGING_PTE_LEVEL_SUPERVISOR;
+    }
+
+  page_directory[0] = (unsigned int)first_page_table |
+    PAGING_PDE_LEVEL_SUPERVISOR |
+    PAGING_PDE_ACCESS_RW |
+    PAGING_PDE_PRESENT_TRUE;
+
+  page_directory[1] = (unsigned int)second_page_table |
+    PAGING_PDE_LEVEL_SUPERVISOR |
+    PAGING_PDE_ACCESS_RW |
+    PAGING_PDE_PRESENT_TRUE;
 
   enable_paging(page_directory);
 }

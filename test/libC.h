@@ -1,13 +1,19 @@
 #ifndef LIBC_H_
 #define LIBC_H_
 
-typedef unsigned int uint32_t;
-typedef unsigned short int uint16_t;
+/* typedef unsigned int uint32_t; */
+/* typedef unsigned long long int uint64_t; */
+/* typedef unsigned short int uint16_t; */
+/* typedef int int32_t; */
+/* typedef long long int int64_t; */
+/* typedef short int int16_t; */
+/* typedef char int8_t; */
+/* typedef unsigned char uint8_t; */
+/* typedef unsigned char uchar; */
+
+#include <stdint.h>
 
 typedef unsigned int size_t;
-#ifndef HAS_UINTPTR_T
-typedef unsigned int uintptr_t;
-#endif
 
 #define NULL ((void*)0)
 

@@ -14,14 +14,25 @@ void kmain(struct multiboot_info* mbi, unsigned int magic )
     }
   
   clear_screen();
+
+  puts("\n\n         *** Booting my_kernel ***\n\n");
+  
+
+
   elf_init((void*)mbi->u.elf_sec.addr, mbi->u.elf_sec.num, mbi->u.elf_sec.shndx);
+  dump_memory_map(mbi);
   rmm_init();
   
-  puts("           Booting my_kernel");
-  
+  puts("Is paging enabled (0 = yes) ?");
+  putnbr(is_paging_enabled());
+  putchar('\n');
+
+  /* set_pages(); */
+  /* puts("Paging should be enabled !"); */
   /* puts("Is paging enabled (0 = yes) ?"); */
   /* putnbr(is_paging_enabled()); */
   /* putchar('\n'); */
+
   /* set_pages(); */
   /* puts("Paging should be enabled !"); */
   /* puts("Is paging enabled (0 = yes) ?"); */

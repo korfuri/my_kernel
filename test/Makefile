@@ -1,5 +1,7 @@
 CFLAGS= -W -Wall -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -I. -std=gnu99
 OBJECTS= loader.o kernel.o libC.o tty.o paging.o rmm.o panic.o elfkernel.o
+LIBGCC=$(shell locate libgcc.a | head -n 1)
+LDFLAGS= -L$(shell dirname $(LIBGCC)) -lgcc
 M= Makefile
 LS= linker.ld
 GRUBDIR=.
@@ -12,7 +14,8 @@ PADSIZE=750
 	gcc $(CFLAGS) -o $@ -c $<
 
 kernel.bin: $(OBJECTS) $(M) $(LS)
-	ld -T $(LS) -o $@ $(OBJECTS)
+	echo $(LIBGCC)
+	ld -T $(LS) -o $@ $(OBJECTS) $(LDFLAGS)
 
 pad: $(M)
 	dd if=/dev/zero of=pad bs=1 count=$(PADSIZE)

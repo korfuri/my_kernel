@@ -38,4 +38,34 @@ void page_directory_apply(struct page_directory* pd);
 #define PAGING_PDE_PRESENT_TRUE 1
 #define PAGING_PDE_PRESENT_FALSE 0
 
+
+
+// Page table entries control bits
+
+#define PAGING_PTE_GLOBAL_FALSE 0
+#define PAGING_PTE_GLOBAL_TRUE (1 << 8)
+
+// bit 7 is ignored
+
+#define PAGING_PTE_DIRTY_FALSE 0
+#define PAGING_PTE_DIRTY_TRUE (1 << 6)
+
+#define PAGING_PTE_ACCESSED_FALSE 0
+#define PAGING_PTE_ACCESSED_TRUE (1 << 5)
+
+#define PAGING_PTE_CACHE_ENABLE 0
+#define PAGING_PTE_CACHE_DISABLE (1 << 4)
+
+#define PAGING_PTE_WRITETHROUGH_DISABLE 0
+#define PAGING_PTE_WRITETHROUGH_ENABLE (1 << 3)
+
+#define PAGING_PTE_LEVEL_USER (1 << 2)
+#define PAGING_PTE_LEVEL_SUPERVISOR 0
+
+#define PAGING_PTE_ACCESS_RW (1 << 1)
+#define PAGING_PTE_ACCESS_RO 0
+
+#define PAGING_PTE_PRESENT_TRUE 1
+#define PAGING_PTE_PRESENT_FALSE 0
+
 #endif

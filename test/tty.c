@@ -26,13 +26,13 @@ void putstrn(char* str, size_t s) {
 }
 
 
-static void putnbr_r(unsigned int n) {
+static void putnbr_r(int64_t n) {
   if (n > 9)
     putnbr_r(n / 10);
   putchar('0' + (n % 10));
 }
 
-void putnbr(int n) {
+void putnbr(int64_t n) {
   if (n < 0) {
     putchar('-');
     putnbr_r(-n);
@@ -41,7 +41,7 @@ void putnbr(int n) {
   }
 }
 
-static void putnbr16_r(unsigned int n) {
+static void putnbr16_r(uint64_t n) {
   if (n > 15)
     putnbr16_r(n / 16);
   if (n % 16 < 10)
@@ -50,7 +50,7 @@ static void putnbr16_r(unsigned int n) {
     putchar('A' - 10 + (n % 16));
 }
 
-void putnbr16(unsigned int n) {
+void putnbr16(uint64_t n) {
   putchar('0');
   putchar('x');
   putnbr16_r(n);
@@ -80,23 +80,54 @@ void putchar(char c) {
 
 void printf(char* format, ...) {
   va_list arg;
+  char	type[10];
+  unsigned int j = 0;
+  uint64_t value;
   
   va_start(arg, format);
   for (size_t i = 0; format[i] != '\0'; i++) {
     if (format[i] == '%') {
       i++;
+      type[0] = '\0';
+      if (format[i] == '(') {
+	i++;
+	j = 0;
+	while (j < 9 && format[i] != '\0' && format[i] != ')') {
+	  type[j] = format[i];
+	  i++;
+	  j++;
+	}
+	type[j] = '\0';
+	if (format[i] == ')')
+	  i++;
+      }
+      if (!strcmp(type, "int64_t") ||
+	  !strcmp(type, "uint64_t")) {
+	value = va_arg(arg, uint64_t);
+      }
+      else if (!strcmp(type, "int16_t") ||
+	       !strcmp(type, "uint16_t"))
+	value = va_arg(arg, uint32_t); // int16 are promoted to int32 when passed through ...
+      else if (!strcmp(type, "int8_t") ||
+	       !strcmp(type, "uint8_t") ||
+	       !strcmp(type, "char") ||
+	       !strcmp(type, "uchar"))
+	value = va_arg(arg, uint32_t); // int8 are promoted to int32 when passed through ...
+      else
+	value = va_arg(arg, uint32_t);
+      
       switch (format[i]) {
       case 's':
-	putstr(va_arg(arg, char*));
+	putstr((char*)(uint32_t)value);
 	break;
       case 'i':
       case 'd':
-	putnbr(va_arg(arg, int));
+	putnbr((int64_t)value);
       break;
       case 'x':
       case 'X':
       case 'p':
-	putnbr16(va_arg(arg, unsigned int));
+	putnbr16((uint64_t)value);
       break;
       case '\0':
       default:

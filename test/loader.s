@@ -1,5 +1,4 @@
 global loader           	; making entry point visible to linker
-global endofbacktrace
 global stack
 
 extern kmain            ; kmain is defined elsewhere
@@ -11,8 +10,9 @@ extern kmain            ; kmain is defined elsewhere
 	MAGIC       equ    0x1BADB002	       ; 'magic number' lets bootloader find the header
 	CHECKSUM    equ -(MAGIC + FLAGS)       ; checksum required
 
-	section .text
-	align 4
+section .text
+align 4
+
 MultiBootHeader:
 	dd MAGIC
 	dd FLAGS

@@ -8,8 +8,8 @@ void clear_screen(void);
 void puts(char* str);
 void putstr(char* str);
 void putstrn(char* str, size_t s);
-void putnbr16(unsigned int n);
-void putnbr(int n);
+void putnbr16(uint64_t n);
+void putnbr(int64_t n);
 void printf(char* format, ...);
 
 #endif

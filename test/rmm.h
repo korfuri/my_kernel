@@ -9,9 +9,11 @@
 
 #include <libC.h>
 #include <paging.h> // For PAGE_SIZE
+#include <multiboot.h>
 
 /*
 ** Information about a 4k chunk, in physical memory
+** This structure must not exceed 32 bits
 */
 struct rmm_pageinfo {
   uint16_t		ref_count;
@@ -35,6 +37,7 @@ struct rmm_internal {
 
 void	rmm_init(void);
 uintptr_t rmm_allocate_page(void);
+void dump_memory_map(struct multiboot_info* mbi);
 
 #define CHUNK_SIZE (1024 * PAGE_SIZE)
 

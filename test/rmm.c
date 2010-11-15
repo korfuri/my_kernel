@@ -1,11 +1,13 @@
 #include <rmm.h>
 #include <libC.h>
-#include <paging.h> // for PAGE_SIZE
+#include <paging.h>
 #include <panic.h>
+#include <multiboot.h>
+#include <tty.h>
 
 static struct rmm_internal rmm_info;
 
-// Below this address, physical memory is reserved : 0xa0000 - 0xfffff
+// Below this address, physical memory is reserved : 0x1000 0000 - 0xffff ffff
 // is hardware-specific, below is kernel-reserved
 static inline uintptr_t rmm_min_physical_addr(void) {
   return 0x1000000;
@@ -63,6 +65,7 @@ static uintptr_t rmm_allocate_page_in_chunk(unsigned int chunkID) {
       return (chunkID * 1024 + i) * 4096;
     }
   }
+  panic("No free page in allocate_page_in_chunk when pti->free_page_count was > 0");
   return 0;
 }
 
@@ -78,4 +81,33 @@ uintptr_t rmm_allocate_page(void) {
   }
   panic("Out of physical memory");
   return 0;
+}
+
+unsigned int* rmm_get_rmmpage(void) {
+  static unsigned int* p = 0;
+  if (p)
+    return p;
+  p = (unsigned int*)rmm_allocate_page();
+  for (unsigned int i = 0; i < 1024; i++)
+    p[i] = i * 4096 | PAGING_PTE_ACCESS_RW | PAGING_PTE_LEVEL_SUPERVISOR | PAGING_PTE_PRESENT_TRUE;
+  return p;
+}
+
+void dump_memory_map(struct multiboot_info* mbi) {
+  multiboot_memory_map_t* mmap = (multiboot_memory_map_t*)mbi->mmap_addr;
+  
+  printf("==== BEGIN MEMORY MAP ====\n");
+  while((uint32_t)mmap < mbi->mmap_addr + mbi->mmap_length) {
+    printf("%(uint64_t)p : length=%(uint64_t)x, type=%s, size=%x\n",
+	   mmap->addr,
+	   mmap->len,
+	   ((mmap->type == MULTIBOOT_MEMORY_AVAILABLE) ?
+	    ("available") :
+	    ((mmap->type == MULTIBOOT_MEMORY_RESERVED) ?
+	     ("reserved") :
+	     ("other"))),
+	   mmap->size);
+    mmap = (multiboot_memory_map_t*)((unsigned int)mmap + mmap->size + sizeof(unsigned int));
+  }
+  printf("==== END MEMORY MAP ====\n");
 }
