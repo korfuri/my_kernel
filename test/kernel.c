@@ -26,10 +26,12 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
 	 total_free_memory,
 	 total_free_memory / (1024*1024));
   
-  puts("Is paging enabled (0 = yes) ?");
-  putnbr(is_paging_enabled());
-  putchar('\n');
+  printf("Is paging enabled ? %s\n", is_paging_enabled() ? "no" : "yes");
 
+  init_paging();
+
+  printf("Is paging enabled ? %s\n", is_paging_enabled() ? "no" : "yes");
+  
   /* set_pages(); */
   /* puts("Paging should be enabled !"); */
   /* puts("Is paging enabled (0 = yes) ?"); */

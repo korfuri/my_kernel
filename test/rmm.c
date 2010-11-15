@@ -58,7 +58,7 @@ void rmm_reclaim_page(uintptr_t page) {
 }
 
 void rmm_reclaim_chunk(uintptr_t chunk) {
-  uint32_t chunkID = page / (1024 * 4096);
+  uint32_t chunkID = chunk / (1024 * 4096);
 
   if (rmm_gl_metadata_addr->chunk[chunkID].free_pages_count != 0)
     panic("rmm_reclaim_chunk called on a non-totally-free chunk");
