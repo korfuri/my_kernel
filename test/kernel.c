@@ -20,8 +20,11 @@ void kmain(struct multiboot_info* mbi, unsigned int magic )
 
 
   elf_init((void*)mbi->u.elf_sec.addr, mbi->u.elf_sec.num, mbi->u.elf_sec.shndx);
-  dump_memory_map(mbi);
-  rmm_init();
+
+  size_t total_free_memory = rmm_init(mbi);
+  printf("We have %x bytes available (%d MiB)\n",
+	 total_free_memory,
+	 total_free_memory / (1024*1024));
   
   puts("Is paging enabled (0 = yes) ?");
   putnbr(is_paging_enabled());

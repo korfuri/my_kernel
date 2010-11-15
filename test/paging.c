@@ -28,7 +28,6 @@ void set_first_pages(void) {
   unsigned int *page_directory = (unsigned int*)rmm_allocate_page();
   unsigned int *first_page_table = (unsigned int*)rmm_allocate_page();
   unsigned int *second_page_table = (unsigned int*)rmm_allocate_page();
-  unsigned int *third_page_table = (unsigned int*)rmm_get_rmmpage();
 
   printf("pde = %p\npte0 = %p\npte1 = %p\n", page_directory, first_page_table, second_page_table);
   

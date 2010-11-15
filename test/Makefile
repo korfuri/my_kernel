@@ -14,7 +14,6 @@ PADSIZE=750
 	gcc $(CFLAGS) -o $@ -c $<
 
 kernel.bin: $(OBJECTS) $(M) $(LS)
-	echo $(LIBGCC)
 	ld -T $(LS) -o $@ $(OBJECTS) $(LDFLAGS)
 
 pad: $(M)
