@@ -6,7 +6,7 @@
 #include <multiboot.h>
 #include <elfkernel.h>
 
-void kmain(struct multiboot_info* mbi, unsigned int magic )
+void kmain(struct multiboot_info* mbi, unsigned int magic)
 {
   if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
     {

@@ -8,7 +8,7 @@
 #define RMM_H_
 
 #include <libC.h>
-#include <paging.h> // For PAGE_SIZE
+#include <paging.h>
 #include <multiboot.h>
 
 /*
@@ -50,6 +50,12 @@ uintptr_t rmm_allocate_page(void);
 // Gives back a physical page to the RMM. This takes any address in
 // the page, but this may have to change some day.
 void rmm_reclaim_page(uintptr_t page);
+
+// Return the boundaries of the reserved space. Space between is
+// allocated through RMM functions. Space out of these boundaries
+// should always be identity paged.
+uintptr_t rmm_min_physical_addr(void);
+uintptr_t rmm_max_physical_addr(void);
 
 #ifdef RMM_DEBUG
 // Debug utility : dumps the memory map (as provided by Multiboot) to the screen

@@ -10,13 +10,11 @@ static struct rmm_internal* rmm_gl_metadata_addr = 0;
 static uintptr_t rmm_gl_min_physical_addr = 0;
 static uintptr_t rmm_gl_max_physical_addr = 0;
 
-// Below this address, physical memory is reserved : 0x1000 0000 - 0xffff ffff
-// is hardware-specific, below is kernel-reserved
-static inline uintptr_t rmm_min_physical_addr(void) {
+uintptr_t rmm_min_physical_addr(void) {
   return rmm_gl_min_physical_addr;
 }
 
-static inline uintptr_t rmm_max_physical_addr(void) {
+uintptr_t rmm_max_physical_addr(void) {
   return rmm_gl_max_physical_addr;
 }
 

@@ -24,6 +24,8 @@ static void enable_paging(void* page_directory) {
   asm volatile("mov %0, %%cr0":: "b"(cr0));
 }
 
+
+
 void set_first_pages(void) {
   unsigned int *page_directory = (unsigned int*)rmm_allocate_page();
   unsigned int *first_page_table = (unsigned int*)rmm_allocate_page();
