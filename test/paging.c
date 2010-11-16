@@ -224,8 +224,7 @@ void destroy_current_paging_context(paging_context fallback) {
   // We can now context-switch to our fallback context
   restore_paging_context(fallback);
 
-  // Now we can destroy all mappings from out
-  // paging_context_to_destroy
+  // Now we can destroy all mappings from our paging_context_to_destroy
   // We don't need to touch the protected areas as the ref counting is
   // disabled in those
 
@@ -259,6 +258,30 @@ void destroy_current_paging_context(paging_context fallback) {
   restore_paging_context(current_paging_context_physical());
 
   // And we're done.
+}
+
+
+void remove_page_from_paging_context(struct pager* pager,
+				     uintptr_t virtual_address) {
+  uint32_t pageID = virtual_address / PAGE_SIZE;
+  uint32_t chunkID = pageID / 1024;
+  uint32_t page_in_chunk = pageID - (chunkID * 1024);
+
+  // Rounds the virtual address to PAGE_SIZE
+  virtual_address /= 4096;
+  virtual_address *= 4096;
+  // Decrements the ref counter to this page
+  rmm_reclaim_page(pager->pt[chunkID][page_in_chunk]);
+  // Unmap this page
+  pager->pt[chunkID][page_in_chunk] = PAGING_PTE_DEFAULT_FLAGS | PAGING_PTE_PRESENT_FALSE;
+  // invlpg invalidates a page entry in the TLB
+  asm volatile("invlpg %0":: "m"(*(uintptr_t*)virtual_address));
+  // Look in this chunk for another mapped page
+  for (uint32_t p = 0; p < 1024; p++)
+    if (pager->pt[chunkID][p] & PAGING_PTE_PRESENT_TRUE)
+      return;
+  // If none was found, clear the whole PDE
+  pager->pd[chunkID] = PAGING_PDE_DEFAULT_FLAGS | PAGING_PDE_PRESENT_FALSE;
 }
 
 void restore_paging_context(paging_context ctx) {

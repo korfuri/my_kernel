@@ -73,7 +73,6 @@ void add_range_paging_protected(struct pager* pager,
 
 // Remove a user-allocated page from a paging context, and have rmm
 // reclaim it
-TODO(korfuri, Code remove_page_from_paging_context);
 void remove_page_from_paging_context(struct pager* pager,
 				     uintptr_t virtual_address);
 
