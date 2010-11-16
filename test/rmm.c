@@ -155,11 +155,6 @@ size_t	rmm_init(struct multiboot_info* mbi) {
       rmm_gl_metadata_addr->chunk[pageID / 1024].free_pages_count--;
     }
   }
-
-  printf("gl_min_physical_addr = %x\n", rmm_gl_min_physical_addr);
-  printf("gl_max_physical_addr = %x\n", rmm_gl_max_physical_addr);
-  printf("Available size = %x\n", rmm_gl_max_physical_addr - rmm_gl_min_physical_addr);
-
   return rmm_gl_max_physical_addr - rmm_gl_min_physical_addr;
 }
 

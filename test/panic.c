@@ -25,7 +25,7 @@ void backtrace(void) {
   puts("End of backtrace");
 }
 
-void kmain();
+void kmain(void);
 
 void panic(char* error_msg) {
   puts("\n======= PANIC =======");
