@@ -50,6 +50,12 @@ paging_context init_paging(void);
 // pager and the alternative struct pager.
 paging_context fork_paging_context(void);
 
+// Destroys the current paging context, and switches back to the given
+// paging_context
+// All physical pages between rmm_min_physical_addr and
+// rmm_max_physical_addr will see their ref_count decremented
+void destroy_current_paging_context(paging_context fallback);
+
 // This function returns the physical address associated to a given
 // virtual address in the given struct pager.
 // The address doesn't need to be rounded to PAGE_SIZE, and the
@@ -64,6 +70,12 @@ void add_range_paging_protected(struct pager* pager,
 				uintptr_t virtual_address,
 				uintptr_t physical_address,
 				size_t size);
+
+// Remove a user-allocated page from a paging context, and have rmm
+// reclaim it
+TODO(korfuri, Code remove_page_from_paging_context);
+void remove_page_from_paging_context(struct pager* pager,
+				     uintptr_t virtual_address);
 
 // This returns the currently used struct pager (virtual address)
 // This is a constant value.

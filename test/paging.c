@@ -53,7 +53,7 @@ void add_range_paging_protected(struct pager* pager,
       PAGING_PDE_PRESENT_TRUE |
       PAGING_PDE_LEVEL_SUPERVISOR |
       PAGING_PDE_ACCESS_RW;
-    
+
     // Enable the page's PTE for protected mapping
     pager->pt[chunkID][page_in_chunk] = (physical_address) |
       PAGING_PTE_DEFAULT_FLAGS |
@@ -80,7 +80,7 @@ void add_identity_paging(struct pager* pager, paging_context context, uintptr_t 
 
   if (address > MAX_PAGED_ADDRESS)
     panic("address > MAX_PAGED_ADDRESS");
-  
+
   // Enable the chunk's PDE for identity mapping
   pager->pd[chunkID] = ((uintptr_t)(pager->pt[chunkID]) - (uintptr_t)pager + context) |
     PAGING_PDE_DEFAULT_FLAGS |
@@ -173,13 +173,13 @@ paging_context fork_paging_context(void) {
 
   // Sets up the mandatory identity paged chunks
   build_basic_paging(alternative_page_directory, physical_new_page_directory);
-  
+
   // Sets up the paging to have page_directory and
   // alternative_page_directory mapped to their corresponding physical
   // chunks in the new page directory
   add_range_paging_protected(alternative_page_directory, (uintptr_t)page_directory, virtual_to_physical(page_directory, (uintptr_t)alternative_page_directory), CHUNK_SIZE);
   add_range_paging_protected(alternative_page_directory, (uintptr_t)alternative_page_directory, rmm_allocate_chunk(), CHUNK_SIZE);
-  
+
   // Let's replace our alternative page directory in the old context,
   // we don't want this old context to change it now
   add_range_paging_protected(page_directory, (uintptr_t)alternative_page_directory, rmm_allocate_chunk(), CHUNK_SIZE);
@@ -189,6 +189,76 @@ paging_context fork_paging_context(void) {
 
   // This returns the new paging_context
   return physical_new_page_directory;
+}
+
+void destroy_current_paging_context(paging_context fallback) {
+  paging_context paging_context_to_destroy = current_paging_context_physical();
+
+  // We won't fork this paging context. Let's get rid of the
+  // alternative_page_directory
+  rmm_reclaim_chunk(virtual_to_physical(current_paging_context_virtual(), (uintptr_t)alternative_page_directory));
+
+  // Now we can use the alternative_page_directory to map our
+  // fallback context
+  add_range_paging_protected(page_directory, (uintptr_t)alternative_page_directory, fallback, CHUNK_SIZE);
+  // Force the flush of the TLB - suboptimal, we could use INVLPGs
+  restore_paging_context(paging_context_to_destroy);
+
+  // Now we are going to do something tricky. We will edit our
+  // fallback context (through alternative_page_directory) to map the
+  // current paging context in its own
+  // alternative_page_directory. Then we will context switch to
+  // fallback, from where we will be able to destroy the original
+  // context.
+
+  // First step : save the alternative_page_directory of our fallback
+  // context
+  paging_context save_alternative_pd = virtual_to_physical(alternative_page_directory, (uintptr_t)alternative_page_directory);
+
+  // Now we can map the current context as the
+  // alternative_page_directory of the fallback context
+  // This overwrites the mapping of alternative_page_directory to
+  // save_alternative_pd in this context
+  add_range_paging_protected(alternative_page_directory, (uintptr_t)alternative_page_directory, paging_context_to_destroy, CHUNK_SIZE);
+
+  // We can now context-switch to our fallback context
+  restore_paging_context(fallback);
+
+  // Now we can destroy all mappings from out
+  // paging_context_to_destroy
+  // We don't need to touch the protected areas as the ref counting is
+  // disabled in those
+
+  // We can first cleanup all user allocated pages
+  struct pager* pager = alternative_page_directory;
+  // We iterate on each chunk of the mapping
+  for (uint32_t chunkID = (rmm_min_physical_addr() / CHUNK_SIZE) + 2;
+       chunkID < (rmm_max_physical_addr() / CHUNK_SIZE) && chunkID < 1023;
+       chunkID++) {
+    // If the chunk is present, we iterate on each page
+    if (pager->pd[chunkID] & PAGING_PDE_PRESENT_TRUE) {
+      for (uint32_t pageIDc = 0; pageIDc < 1024; pageIDc++) {
+	if (pager->pt[chunkID][pageIDc] & PAGING_PTE_PRESENT_TRUE) {
+	  // We only ask RMM to reclaim the page, there's no need to
+	  // update the present bit - we are going to destroy this
+	  // mapping right after
+	  rmm_reclaim_page(pager->pt[chunkID][pageIDc]);
+	}
+      }
+    }
+  }
+  
+  // Finally we can reclaim the page directory itself as we don't need
+  // it anymore
+  rmm_reclaim_chunk(virtual_to_physical(alternative_page_directory, (uintptr_t)page_directory));
+
+  // Now that we're done with the old page directory, we can reset our
+  // alternative_page_directory to a blank one :
+  add_range_paging_protected(page_directory, (uintptr_t)alternative_page_directory, save_alternative_pd, CHUNK_SIZE);
+  // Force the flush of the TLB - suboptimal, we could use INVLPGs
+  restore_paging_context(current_paging_context_physical());
+
+  // And we're done.
 }
 
 void restore_paging_context(paging_context ctx) {
@@ -203,6 +273,6 @@ struct pager* current_paging_context_virtual(void) {
 
 paging_context current_paging_context_physical(void) {
   struct pager* v = current_paging_context_virtual();
-  
+
   return virtual_to_physical(v, (uintptr_t)v);
 }

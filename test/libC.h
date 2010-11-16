@@ -21,4 +21,7 @@ void* memcpy(void* dest, void* src, size_t size);
 void* memset(void* memory, unsigned char c, size_t size);
 int strcmp(char* s1, char* s2);
 
+#define DO_PRAGMA(x) _Pragma (#x)
+#define TODO(who, what) DO_PRAGMA(message ("TODO(" #who ") - " #what))
+
 #endif

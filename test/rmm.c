@@ -53,8 +53,9 @@ void rmm_reclaim_page(uintptr_t page) {
   uint32_t pageID = page / 4096;
 
   rmm_gl_metadata_addr->page[pageID].ref_count--;
-  if (rmm_gl_metadata_addr->page[pageID].ref_count == 0)
+  if (rmm_gl_metadata_addr->page[pageID].ref_count == 0) {
     rmm_gl_metadata_addr->chunk[pageID / 1024].free_pages_count++;
+  }
 }
 
 void rmm_reclaim_chunk(uintptr_t chunk) {

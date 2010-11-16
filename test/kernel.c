@@ -32,6 +32,7 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
   printf("Is paging enabled ? %s\n", is_paging_enabled() ? "no" : "yes");
 
   uintptr_t p1 = rmm_allocate_page();
+  printf("Mapping %p to 0x0ff0 0000 in this context (kernel)\n", p1);
   add_range_paging_protected(current_paging_context_virtual(), 0x0ff00000, p1, PAGE_SIZE);
 
   volatile int* ptr = (int*)0x0ff00000;
@@ -39,6 +40,7 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
 
   paging_context ctx1 = fork_paging_context();
   uintptr_t p2 = rmm_allocate_page();
+  printf("Mapping %p to 0x0ff0 0000 in this context (ctx1)\n", p2);
   add_range_paging_protected(current_paging_context_virtual(), 0x0ff00000, p2, PAGE_SIZE);
 
   *ptr = 21;
@@ -47,5 +49,9 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
   printf("In kernel paging context, *ptr = %d\n", *ptr);
   restore_paging_context(ctx1);
   printf("In ctx1 paging context, *ptr = %d\n", *ptr);
+
+  destroy_current_paging_context(kernel_paging_context);
+  printf("In kernel paging context, *ptr = %d\n", *ptr);
+
   panic("End of kmain()");
 }
