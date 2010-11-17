@@ -30,7 +30,7 @@ boot.img: kernel.bin pad pad2
 	cat $(GRUBDIR)/stage1 $(GRUBDIR)/stage2 pad kernel.bin pad2 > $@
 
 test: boot.img
-	qemu $(QEMU_FLAGS) -m $(QEMU_RAM) -hda boot.img
+	cat bootscript | qemu $(QEMU_FLAGS) -m $(QEMU_RAM) -hda boot.img -monitor stdio > /dev/null
 
 fclean:
 	rm -f $(OBJECTS) kernel.bin boot.img pad pad2
