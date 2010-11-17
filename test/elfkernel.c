@@ -4,11 +4,15 @@
 #include <elfkernel.h>
 #include <tty.h>
 #include <libC.h>
+#include <panic.h>
 
 static char* shtrtab = NULL;
 static char* strtab = NULL;
 static Elf32_Sym* symtab = NULL;
 static unsigned int symcount = 0;
+static uintptr_t text_begin = 0;
+static uintptr_t text_end = 0;
+
 
 void elf_init(void* vshdr, unsigned int num, unsigned int shstrndx) {
   Elf32_Shdr* shdr = vshdr;
@@ -20,8 +24,13 @@ void elf_init(void* vshdr, unsigned int num, unsigned int shstrndx) {
       symcount = shdr[i].sh_size / sizeof(Elf32_Sym);
     } else if (!strcmp(shtrtab + shdr[i].sh_name, ".strtab")) {
       strtab = (char*)(shdr[i].sh_addr);
+    } else if (!strcmp(shtrtab + shdr[i].sh_name, ".text")) {
+      text_begin = shdr[i].sh_addr;
+      text_end = shdr[i].sh_addr + shdr[i].sh_size;
     }
   }
+  if (text_end == 0 || text_begin == 0 || strtab == NULL || symtab == NULL || symcount == 0)
+    panic("Misformed ELF kernel");
 }
 
 char* elf_get_sym_name_before(uintptr_t eip, size_t* diff) {
@@ -29,13 +38,10 @@ char* elf_get_sym_name_before(uintptr_t eip, size_t* diff) {
   char*		best_string = "<unknown>";
   
   for (unsigned int i = 0; i < symcount; i++) {
-    if (eip >= (uintptr_t)symtab[i].st_value) { // && (symtab[i].st_info & STT_FUNC)) {
+    if (eip >= (uintptr_t)symtab[i].st_value && (uintptr_t)symtab[i].st_value >= text_begin && (uintptr_t)symtab[i].st_value < text_end) {
       if ((uintptr_t)symtab[i].st_value > best_value) {
 	best_value = symtab[i].st_value;
-	if (symtab[i].st_name > 0)
-	  best_string = strtab + symtab[i].st_name;
-	else
-	  best_string = "<unknown>";
+	best_string = strtab + symtab[i].st_name;
       }
     }
   }

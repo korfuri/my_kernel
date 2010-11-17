@@ -20,7 +20,7 @@ void backtrace(void) {
 
     symname = elf_get_sym_name_before(eip, &diff);
     
-    printf("%p <%s+%x> (ebp = %p)\n", eip, symname, diff, ebp);
+    printf("%p (%s<%x>+%x), ebp = %p\n", eip, symname, eip - diff, diff, ebp);
   }
   puts("End of backtrace");
 }
