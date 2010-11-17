@@ -33,7 +33,7 @@ test: boot.img
 	qemu $(QEMU_FLAGS) -m $(QEMU_RAM) -hda boot.img
 
 fclean:
-	rm -f $(OBJECTS) kernel.bin boot.img pad
+	rm -f $(OBJECTS) kernel.bin boot.img pad pad2
 
 all: boot.img
 
