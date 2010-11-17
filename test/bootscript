@@ -1,17 +1,3 @@
-sendkey The_first_keystrokes_are_ignored_so_we_pad_with_junk
-sendkey sdfsdffsdf
-sendkey sdfsdffsdf
-sendkey sdfsdffsdf
-sendkey sdfsdffsdf
-sendkey sdfsdffsdf
-sendkey sdfsdffsdf
-sendkey sdfsdffsdf
-sendkey sdfsdffsdf
-sendkey sdfsdffsdf
-sendkey sdfsdffsdf
-sendkey sdfsdffsdf
-sendkey sdfsdffsdf
-sendkey This_is_kernel_200+90000
 sendkey k
 sendkey e
 sendkey r
@@ -30,7 +16,6 @@ sendkey 0
 sendkey 0
 sendkey 0
 sendkey ret
-sendkey This_is_boot
 sendkey b
 sendkey o
 sendkey o
