@@ -12,6 +12,7 @@ void backtrace(void) {
 
   asm volatile("mov %%ebp, %0": "=b"(ebp));
 
+  printf("   eip\t\t   symbol + offset\t\t   ebp\n");
   while (i++ < MAX_BACKTRACE_DEPTH) {
     eip = *(uintptr_t*)(ebp + 4);
     ebp = *(uintptr_t*)(ebp);
@@ -20,16 +21,15 @@ void backtrace(void) {
 
     symname = elf_get_sym_name_before(eip, &diff);
     
-    printf("%p (%s<%x>+%x), ebp = %p\n", eip, symname, eip - diff, diff, ebp);
+    printf("%p\t%s<%x>+%x\t\%p\n", eip, symname, eip - diff, diff, ebp);
   }
-  puts("End of backtrace");
+  puts("End of backtrace\n");
 }
 
 void kmain(void);
 
 void panic(char* error_msg) {
-  puts("\n======= PANIC =======");
-  puts(error_msg);
+  printf("\n========= PANIC =========\n\nCaused by : %s\n\nCaused at:\n", error_msg);
   backtrace();
   for (;;);
 }
