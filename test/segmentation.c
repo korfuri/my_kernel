@@ -7,17 +7,16 @@ static void gdt_set_gate(uint32_t num,
 			 uint32_t base,
 			 uint32_t limit,
 			 uint8_t access,
-			 uint8_t gran)
-{
-   gdte[num].base_low    = (base & 0xFFFF);
-   gdte[num].base_middle = (base >> 16) & 0xFF;
-   gdte[num].base_high   = (base >> 24) & 0xFF;
+			 uint8_t gran) {
+  gdte[num].base_low    = (base & 0xFFFF);
+  gdte[num].base_middle = (base >> 16) & 0xFF;
+  gdte[num].base_high   = (base >> 24) & 0xFF;
+  
+  gdte[num].limit_low   = (limit & 0xFFFF);
+  gdte[num].granularity = (limit >> 16) & 0x0F;
 
-   gdte[num].limit_low   = (limit & 0xFFFF);
-   gdte[num].granularity = (limit >> 16) & 0x0F;
-
-   gdte[num].granularity |= gran & 0xF0;
-   gdte[num].access      = access;
+  gdte[num].granularity |= gran & 0xF0;
+  gdte[num].access      = access;
 }
 
 void segmentation_init(void) {
