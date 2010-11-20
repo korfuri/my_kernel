@@ -66,6 +66,9 @@ void putchar(char c) {
     // + COLS * 2 : for line feed
     // - (vram_offset % (COLS * 2)) : for carriage return
     vram_offset += (COLS * 2) - (vram_offset % (COLS * 2));
+  } else if (c == '\t') {
+    // Rounds up to 8
+    vram_offset = (vram_offset + 8) & ~7;
   } else {
     vram[vram_offset++] = c;
     vram[vram_offset++] = 0x07;
