@@ -1,6 +1,8 @@
 #include <tty.h>
 #include <libC.h>
 #include <paging.h>
+#include <segmentation.h>
+#include <interrupts.h>
 #include <rmm.h>
 #include <panic.h>
 #include <multiboot.h>
@@ -15,7 +17,7 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
 
   clear_screen();
 
-  puts("\n\n         *** Booting my_kernel ***\n\n");
+  puts("\n\n\t\t\t*** Booting my_kernel ***\n\n");
 
 
 
@@ -25,7 +27,10 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
   printf("We have %x bytes available (%d MiB)\n",
 	 total_free_memory,
 	 total_free_memory / (1024*1024));
-
+  
+  segmentation_init();
+  interrupts_init();
+  
 
   printf("Is paging enabled ? %s\n", is_paging_enabled() ? "no" : "yes");
   paging_context kernel_paging_context = init_paging();
@@ -53,5 +58,7 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
   destroy_current_paging_context(kernel_paging_context);
   printf("In kernel paging context, *ptr = %d\n", *ptr);
 
+  asm volatile("int $0");
+  
   panic("End of kmain()");
 }

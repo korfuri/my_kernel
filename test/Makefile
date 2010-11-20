@@ -1,5 +1,5 @@
-CFLAGS= -W -Wall -Wstrict-prototypes -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -I. -std=gnu99 -O3 -g
-OBJECTS= loader.o kernel.o libC.o tty.o paging.o rmm.o panic.o elfkernel.o
+CFLAGS= -W -Wall -Wstrict-prototypes -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -I. -std=gnu99 -O3
+OBJECTS= loader.o interrupts_asm.o interrupts_handlers.o segmentation_asm.o kernel.o libC.o tty.o paging.o rmm.o panic.o elfkernel.o interrupts.o segmentation.o
 LIBGCC=$(shell locate libgcc.a | head -n 1)
 LDFLAGS= -L$(shell dirname $(LIBGCC)) -lgcc
 M= Makefile
@@ -20,6 +20,12 @@ QEMU_RAM ?= 512
 kernel.bin: $(OBJECTS) $(M) $(LS)
 	ld -T $(LS) -o $@ $(OBJECTS) $(LDFLAGS)
 
+interrupts_handlers.o: interrupts_handlers.s $(M)
+	nasm -f elf -o $@ $<
+
+interrupts_handlers.s: generate_interrupts_handlers.s.sh $(M)
+	sh generate_interrupts_handlers.s.sh
+
 pad: $(M)
 	dd if=/dev/zero of=pad bs=$(PADSIZE) count=1
 
@@ -33,7 +39,7 @@ test: boot.img
 	(sleep 1; cat bootscript) | qemu $(QEMU_FLAGS) -m $(QEMU_RAM) -hda boot.img -monitor stdio > /dev/null
 
 fclean:
-	rm -f $(OBJECTS) kernel.bin boot.img pad pad2
+	rm -f $(OBJECTS) kernel.bin boot.img pad pad2 interrupts_handlers.s interrupts_handlers.h
 
 all: boot.img
 
