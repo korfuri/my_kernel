@@ -58,7 +58,7 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
   destroy_current_paging_context(kernel_paging_context);
   printf("In kernel paging context, *ptr = %d\n", *ptr);
 
-  asm volatile("int $0");
+  asm volatile("int $3");
   
   panic("End of kmain()");
 }

@@ -1,5 +1,6 @@
-CFLAGS= -W -Wall -Wstrict-prototypes -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -I. -std=gnu99 -O3
-OBJECTS= loader.o interrupts_asm.o interrupts_handlers.o segmentation_asm.o kernel.o libC.o tty.o paging.o rmm.o panic.o elfkernel.o interrupts.o segmentation.o
+CFLAGS= -W -Wall -Wstrict-prototypes -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -I. -std=gnu99 -O0
+FIRST_OBJECTS= interrupts_handlers.o
+OBJECTS= $(FIRST_OBJECTS) loader.o interrupts_asm.o segmentation_asm.o kernel.o libC.o tty.o paging.o rmm.o panic.o elfkernel.o interrupts.o segmentation.o
 LIBGCC=$(shell locate libgcc.a | head -n 1)
 LDFLAGS= -L$(shell dirname $(LIBGCC)) -lgcc
 M= Makefile
@@ -39,7 +40,7 @@ test: boot.img
 	(sleep 1; cat bootscript) | qemu $(QEMU_FLAGS) -m $(QEMU_RAM) -hda boot.img -monitor stdio > /dev/null
 
 fclean:
-	rm -f $(OBJECTS) kernel.bin boot.img pad pad2 interrupts_handlers.s interrupts_handlers.h
+	rm -f $(OBJECTS) kernel.bin boot.img pad pad2 interrupts_handlers.s interrupts_handlers.h idt_set_gates.c
 
 all: boot.img
 
