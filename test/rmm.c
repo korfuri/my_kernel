@@ -5,6 +5,7 @@
 #include <multiboot.h>
 #include <tty.h>
 #include <elf.h>
+#include <kmalloc.h>
 
 static struct rmm_internal* rmm_gl_metadata_addr = 0;
 static uintptr_t rmm_gl_min_physical_addr = 0;
@@ -131,6 +132,15 @@ size_t	rmm_init(struct multiboot_info* mbi) {
   rmm_gl_metadata_addr = (struct rmm_internal*)rmm_gl_min_physical_addr;
   rmm_gl_min_physical_addr += CHUNK_SIZE;
 
+  // Puts the kernel kmalloc()'d data after RMM's data
+  size_t kmalloc_size = KMALLOC_REQUIRED_SPACE;
+  // kmalloc_size must be aligned on CHUNK_SIZE
+  if (kmalloc_size & (~0xffc00000))
+    kmalloc_size = (kmalloc_size + CHUNK_SIZE) & 0xffc00000;
+  kmalloc_size = kmalloc_size & 0xffc00000;  
+  kmalloc_init(rmm_gl_min_physical_addr, kmalloc_size);
+  rmm_gl_min_physical_addr += kmalloc_size;
+  
   // Sanity check - do we still have some memory left ?
   if (rmm_gl_max_physical_addr <= rmm_gl_min_physical_addr)
     panic("No free physical memory");
