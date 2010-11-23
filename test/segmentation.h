@@ -27,7 +27,20 @@ struct		gdt_ptr
 
 void segmentation_init(void);
 
+uintptr_t gdt_set_gate(uint32_t base,
+		       uint32_t limit,
+		       uint8_t access,
+		       uint8_t gran);
+
+void do_gdt_flush(void);
+
 //. ASM
 void gdt_flush(void* gdt);
+
+extern uintptr_t	segment_null;
+extern uintptr_t	segment_kernel_code;
+extern uintptr_t	segment_kernel_stack;
+extern uintptr_t	segment_user_code;
+extern uintptr_t	segment_user_stack;
 
 #endif
