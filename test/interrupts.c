@@ -2,6 +2,7 @@
 #include <interrupts_handlers.h>
 #include <interrupts.h>
 #include <tty.h>
+#include <panic.h>
 
 static struct idt_entry idt_entries[IDT_SIZE];
 static struct idt_ptr idt_ptr;
@@ -31,4 +32,17 @@ void interrupts_init(void) {
   idt_flush(&idt_ptr);
 }
 
-void interrupt_handler_3(void) { printf("Interrupt 3\n"); }
+// Adding interrupt_handler_n here will automatically generate the
+// associated ISR and register it at startup.
+
+void interrupt_handler_3(void) {
+  printf("Interrupt 3\n");
+}
+
+void interrupt_handler_13(void) {
+  panic("General protection fault");
+}
+
+void interrupt_handler_14(void) {
+  panic("Page fault");
+}
