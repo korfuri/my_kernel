@@ -31,6 +31,7 @@ void kmain(void);
 void panic(char* error_msg) {
   printf("\n========= PANIC =========\n\nCaused by : %s\n\nCaused at:\n", error_msg);
   backtrace();
-  for (;;);
+  for (;;)
+    asm volatile("hlt");
 }
 
