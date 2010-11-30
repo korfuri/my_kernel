@@ -7,6 +7,8 @@
 #include <panic.h>
 #include <multiboot.h>
 #include <elfkernel.h>
+#include <process.h>
+#include <tss.h>
 
 void kmain(struct multiboot_info* mbi, unsigned int magic)
 {
@@ -54,11 +56,19 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
   printf("In kernel paging context, *ptr = %d\n", *ptr);
   restore_paging_context(ctx1);
   printf("In ctx1 paging context, *ptr = %d\n", *ptr);
-
+    
   destroy_current_paging_context(kernel_paging_context);
   printf("In kernel paging context, *ptr = %d\n", *ptr);
 
-  asm volatile("int $3");
+  //  tss_init();
   
+  //  asm volatile("int $3");
+  //  asm volatile("hlt");
+  
+  process_init();
+  struct process* pid1 = process_new();
+  //  process_first_sysexit(pid1->esp, pid1->eip);
+  process_schedule(pid1);
+
   panic("End of kmain()");
 }

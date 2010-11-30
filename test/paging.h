@@ -48,6 +48,8 @@ paging_context init_paging(void);
 // The newly created paging context is empty, except for the basics :
 // identity paging of protected areas, plus a paging for the struct
 // pager and the alternative struct pager.
+// While building the paging_context, the pagemapper callback is
+// called. It is passed the newly created struct pager*.
 paging_context fork_paging_context(void);
 
 // Destroys the current paging context, and switches back to the given
