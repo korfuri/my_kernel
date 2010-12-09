@@ -65,10 +65,10 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
   //  asm volatile("int $3");
   //  asm volatile("hlt");
   
-  process_init();
-  struct process* pid1 = process_new();
+  //  process_init();
+  //  struct process* pid1 = process_new();
   //  process_first_sysexit(pid1->esp, pid1->eip);
-  process_schedule(pid1);
+  //  process_schedule(pid1);
 
   panic("End of kmain()");
 }

@@ -37,6 +37,7 @@ void interrupts_init(void) {
 
 void interrupt_handler_3(void) {
   printf("Interrupt 3\n");
+  backtrace();
 }
 
 void interrupt_handler_13(void) {
