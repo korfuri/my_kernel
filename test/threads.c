@@ -1,109 +1,81 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <libC.h>
+#include <tty.h>
+#include <panic.h>
+#include <kmalloc.h>
 
 #define NCR 10
 
-void switch_task_asm(void* esp, volatile unsigned long* where_to_save_esp);
-unsigned long new_task_asm(unsigned long stackbase, void* retpoint, volatile unsigned long* where_to_save_esp);
+void switch_thread_asm(void* esp, volatile unsigned long* where_to_save_esp);
+unsigned long new_thread_asm(unsigned long stackbase, void* retpoint, volatile unsigned long* where_to_save_esp);
 
-void schedule(void);
-void end_of_schedule(unsigned long old_coroutine);
+static volatile int current_thread;
+static volatile int max_thread;
+static volatile unsigned long threads[NCR];
 
-volatile unsigned int current_coroutine;
-volatile unsigned int max_coroutine;
-volatile unsigned long coroutines[NCR];
-
-void new_task(void (*fct)(void));
-
-void a(void);
-void b(void);
-
-void a(void) {
-  printf("In a\n");
-  schedule();
-  new_task(b);
-  printf("In a2\n");
+#ifdef THREADS_DEBUG
+#define thr_printf printf
+#else
+void thr_printf(char* format, ...) {
+  format = 0;
 }
+#endif
 
-void b(void) {
-  printf("In b\n");
-  schedule();
-}
-
-void schedule() {
-  //  coroutines[current_coroutine] = (unsigned long)esp;
-  unsigned long old_coroutine = current_coroutine;
-  if (max_coroutine == -1) {
-    printf("Last coroutine died\n");
-    exit(0);
+void schedule(void) {
+  //  threads[current_thread] = (unsigned long)esp;
+  int old_thread = current_thread;
+  if (max_thread == -1) {
+    panic("Last thread died\n");
   }
-  printf("We are at coroutine #%d\n", current_coroutine);
+  thr_printf("We are at thread #%d\n", current_thread);
   int n = 0;
   do {
-    current_coroutine++;
-    if (current_coroutine > max_coroutine)
-      current_coroutine = 0;
-    printf("Testing corouting %d : %p\n", current_coroutine, coroutines[current_coroutine]);
+    current_thread++;
+    if (current_thread > max_thread)
+      current_thread = 0;
+    thr_printf("Testing corouting %d : %p\n", current_thread, threads[current_thread]);
     n++;
-    if (n > max_coroutine + 1) {
-      printf("No more alive coroutines\n");
-      exit(1);
+    if (n > max_thread + 1) {
+      panic("No more alive threads\n");
     }
-  } while (coroutines[current_coroutine] == 0);
-  printf("We are going to coroutine #%d [%p]\n", current_coroutine, (void*)(coroutines[current_coroutine]));
-  if (current_coroutine != old_coroutine) {
-    if (old_coroutine == -1)
-      switch_task_asm((void*)(coroutines[current_coroutine]), NULL);
+  } while (threads[current_thread] == 0);
+  thr_printf("We are going to thread #%d [%p]\n", current_thread, (void*)(threads[current_thread]));
+  if (current_thread != old_thread) {
+    if (old_thread == -1)
+      switch_thread_asm((void*)(threads[current_thread]), NULL);
     else
-      switch_task_asm((void*)(coroutines[current_coroutine]), &(coroutines[old_coroutine]));
+      switch_thread_asm((void*)(threads[current_thread]), &(threads[old_thread]));
   }
 }
 
-void coroutine_entry(void* old_stack, void (*entry)(void)) {
-  printf("New coroutine ! %p We were previously in coroutine %d\n", entry, current_coroutine);
+void thread_entry(void* old_stack, void (*entry)(void)) {
+  thr_printf("New thread ! %p We were previously in thread %d\n", entry, current_thread);
 
-  coroutines[current_coroutine] = (unsigned long)old_stack;
-  max_coroutine++;
-  current_coroutine = max_coroutine;
+  threads[current_thread] = (unsigned long)old_stack;
+  max_thread++;
+  current_thread = max_thread;
   
-  printf("This coroutine has id #%d\n", current_coroutine);
+  thr_printf("This thread has id #%d\n", current_thread);
   
   (*entry)();
-  printf("Out of coroutine %p\n", entry);
+  thr_printf("Out of thread %p\n", entry);
 
-  coroutines[current_coroutine] = 0;
-  current_coroutine = -1;
+  threads[current_thread] = 0;
+  current_thread = -1;
   for (;;) schedule();
-  printf("We should have switched stacks by now... at %p\n", entry);
+  thr_printf("We should have switched stacks by now... at %p\n", entry);
 }
 
-void new_task(void (*fct)(void)) {
-  unsigned long* stack = malloc(4000);
-  new_task_asm((unsigned long)(stack + 1000), fct, &(coroutines[current_coroutine]));
-  printf("WTF at end of new_task\n");
+void new_thread(void (*fct)(void)) {
+  unsigned long* stack = kmalloc(4000);
+  new_thread_asm((unsigned long)(stack + 1000), fct, &(threads[current_thread]));
+  thr_printf("WTF at end of new_thread\n");
 }
 
-void xmain(void) {
-  printf("In xmain\n");
-  new_task(a);
-  new_task(a);
-  new_task(a);
-  new_task(a);
-  printf("Out of xmain\n");
-}
-
-void start_coroutines(void) {
-  current_coroutine = 0;
-  max_coroutine = -1;
+void start_threads(void (*startfunction)(void)) {
+  current_thread = 0;
+  max_thread = -1;
   for (unsigned int i = 0; i < NCR; i++)
-    coroutines[i] = 0;
-  new_task(xmain);
+    threads[i] = 0;
+  new_thread(startfunction);
   schedule();
-}
-
-int main(void) {
-  printf("In main\n");
-  start_coroutines();
-  printf("Out of coroutines mode, back to main\n");
-  return 0;
 }
