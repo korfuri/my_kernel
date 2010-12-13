@@ -38,7 +38,7 @@ char* elf_get_sym_name_before(uintptr_t eip, size_t* diff) {
   char*		best_string = "<unknown>";
   
   for (unsigned int i = 0; i < symcount; i++) {
-    if (eip >= (uintptr_t)symtab[i].st_value && (uintptr_t)symtab[i].st_value >= text_begin && (uintptr_t)symtab[i].st_value < text_end) {
+    if (symtab[i].st_info & ~(STT_SECTION | STT_FILE) && eip >= (uintptr_t)symtab[i].st_value && (uintptr_t)symtab[i].st_value >= text_begin && (uintptr_t)symtab[i].st_value < text_end) {
       if ((uintptr_t)symtab[i].st_value > best_value) {
 	best_value = symtab[i].st_value;
 	best_string = strtab + symtab[i].st_name;

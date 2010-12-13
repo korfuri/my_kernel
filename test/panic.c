@@ -23,6 +23,8 @@ void backtrace(void) {
     
     printf("%p\t%s<%x>+%x\t\%p\n", eip, symname, eip - diff, diff, ebp);
   }
+  if (i == MAX_BACKTRACE_DEPTH)
+    printf("<Backtrace aborted after %d stackframes>\n", MAX_BACKTRACE_DEPTH);
   puts("End of backtrace\n");
 }
 

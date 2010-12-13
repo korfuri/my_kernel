@@ -9,7 +9,8 @@
 
 #include <libC.h>
 
-#define MAX_BACKTRACE_DEPTH 4
+#define MAX_BACKTRACE_DEPTH 20
 void panic(char* error_msg)  __attribute__((noreturn));
+void backtrace(void);
 
 #endif
