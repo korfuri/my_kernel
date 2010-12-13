@@ -5,22 +5,28 @@
 [GLOBAL schedule]
 [EXTERN	current_thread]
 	
-new_thread_asm:	
-	mov ecx, [esp+8]	; Future EIP
-	mov edx, [esp+4]	; New ESP
-
+new_thread_asm:
+	push ebp
+	mov ebp, esp
+	
 	pushad			; Save everything
 	pushfd
+
+	mov edx, [ebp+8]	; New ESP
+	mov ecx, [ebp+12]	; Future EIP
+				; ebp+16 is where to save old esp
+	mov ebx, [ebp+20]	; "data"
+
 	mov eax, esp 		; Prepare to return the old stack
-	mov [ebp+12], eax	; Save old stack somewhere
+	mov [ebp+16], eax	; Save old stack somewhere
 	
 	mov esp, edx		; Start working on the new stack, yay
+	push ebx		; "Data"
 	push ecx		; Future EIP
 	push eax		; Old stack
-	push 0			; junk data
-	push thread_entry	; At `ret', continue with the given EIP
 
-	ret			; Continue
+	push 0			; 4 bytes junk so thread_entry can read its arguments
+	jmp thread_entry
 
 switch_thread_asm:
 	push ebp

@@ -9,23 +9,25 @@
 #include <elfkernel.h>
 #include <threads.h>
 
-void saygoodbye(void) {
+void saygoodbye(void* data) {
   for (;;) {
-    printf("Saying goodbye\n");
+    printf("Saying goodbye %p\n", data);
     schedule();
   }
 }
 
-void sayhello(void) {
+void sayhello(void* data) {
   for (;;) {
-    printf("Saying hello\n");
+    printf("Saying hello %p\n", data);
     schedule();
   }
 }
 void process_init(void) {
+  paging_context kernel_paging_context = init_paging();
+
   printf("Starting threaded mode...\n");
-  new_thread(saygoodbye);
-  new_thread(sayhello);
+  new_thread(saygoodbye, (void*)0x2a2a2a2a);
+  new_thread(sayhello, (void*)0x33333333);
   for (;;)
     schedule();
 }
@@ -56,7 +58,6 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
 
   /*
     printf("Is paging enabled ? %s\n", is_paging_enabled() ? "no" : "yes");
-    paging_context kernel_paging_context = init_paging();
     printf("Is paging enabled ? %s\n", is_paging_enabled() ? "no" : "yes");
     
     uintptr_t p1 = rmm_allocate_page();

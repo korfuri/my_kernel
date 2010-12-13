@@ -6,7 +6,7 @@
 #define NCR 10
 
 void switch_thread_asm(void* esp, volatile unsigned long* where_to_save_esp);
-unsigned long new_thread_asm(unsigned long stackbase, void* retpoint, volatile unsigned long* where_to_save_esp);
+unsigned long new_thread_asm(unsigned long stackbase, void* retpoint, volatile unsigned long* where_to_save_esp, void* data);
 
 static volatile int current_thread;
 static volatile int max_thread;
@@ -47,7 +47,7 @@ void schedule(void) {
   }
 }
 
-void thread_entry(void* old_stack, void (*entry)(void)) {
+void thread_entry(void* old_stack, void (*entry)(void* data), void* data) {
   thr_printf("New thread ! %p We were previously in thread %d\n", entry, current_thread);
 
   threads[current_thread] = (unsigned long)old_stack;
@@ -55,8 +55,8 @@ void thread_entry(void* old_stack, void (*entry)(void)) {
   current_thread = max_thread;
   
   thr_printf("This thread has id #%d\n", current_thread);
-  
-  (*entry)();
+
+  (*entry)(data);
   thr_printf("Out of thread %p\n", entry);
 
   threads[current_thread] = 0;
@@ -65,17 +65,17 @@ void thread_entry(void* old_stack, void (*entry)(void)) {
   thr_printf("We should have switched stacks by now... at %p\n", entry);
 }
 
-void new_thread(void (*fct)(void)) {
+void new_thread(void (*fct)(void* data), void* data) {
   unsigned long* stack = kmalloc(4000);
-  new_thread_asm((unsigned long)(stack + 1000), fct, &(threads[current_thread]));
+  new_thread_asm((unsigned long)(stack + 1000), fct, &(threads[current_thread]), data);
   thr_printf("WTF at end of new_thread\n");
 }
 
-void start_threads(void (*startfunction)(void)) {
+void start_threads(void (*startfunction)(void*)) {
   current_thread = 0;
   max_thread = -1;
   for (unsigned int i = 0; i < NCR; i++)
     threads[i] = 0;
-  new_thread(startfunction);
+  new_thread(startfunction, NULL);
   schedule();
 }
