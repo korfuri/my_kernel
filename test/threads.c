@@ -58,9 +58,16 @@ void thread_entry(void* old_stack, void (*entry)(void* data), void* data) {
   for (;;) schedule();
 }
 
+static unsigned long thread_new_stack(void) {
+  uintptr_t physical = rmm_allocate_page();
+  add_identity_paging(current_paging_context_virtual(), current_paging_context_physical(), physical);
+  restore_paging_context(current_paging_context_physical());
+  return (unsigned long*)(physical + PAGE_SIZE);
+}
+
 void new_thread(void (*fct)(void* data), void* data) {
-  unsigned long* stack = kmalloc(4000);
-  new_thread_asm((unsigned long)(stack + 1000), fct, &(threads[current_thread].esp), data);
+  unsigned long stack = thread_new_stack();
+  new_thread_asm(stack, fct, &(threads[current_thread].esp), data);
 }
 
 void start_threads(void (*startfunction)(void*)) {

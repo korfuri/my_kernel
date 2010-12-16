@@ -13,24 +13,24 @@
 void saygoodbye(void* data) {
   for (;;) {
     printf("Saying goodbye %p\n", data);
-    //schedule();
+    schedule();
   }
 }
 
 void sayhello(void* data) {
   for (;;) {
     printf("Saying hello %p\n", data);
-    //schedule();
+    schedule();
   }
 }
 void process_init(void) {
-  paging_context kernel_paging_context = init_paging();
-
   printf("Starting threaded mode...\n");
   new_thread(saygoodbye, (void*)0x2a2a2a2a);
   new_thread(sayhello, (void*)0x33333333);
-  for (;;)
+  for (;;) {
+    //    asm volatile("hlt");
     schedule();
+  }
 }
 
 void kmain(struct multiboot_info* mbi, unsigned int magic)
@@ -100,6 +100,8 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
   //  process_first_sysexit(pid1->esp, pid1->eip);
   //  process_schedule(pid1);
 
+  paging_context kernel_paging_context = init_paging();
+  
   start_threads(process_init);
 
   panic("End of kmain()");

@@ -73,7 +73,7 @@ void interrupt_handler_14(struct registers regs, unsigned long info, unsigned lo
 void interrupt_handler_32(void) {
   printf("tick\n");
   outportb(0x20, 0x20);
-  schedule();
+  //schedule();
 }
 
 void interrupt_handler_33(void) {
