@@ -37,3 +37,7 @@ void panic(char* error_msg) {
     asm volatile("hlt");
 }
 
+void dump_regs(struct registers* regs) {
+  printf("eax: %p\tebx: %p\tecx: %p\tedx: %p\n", regs->eax, regs->ebx, regs->ecx, regs->edx);
+  printf("esp: %p\tebp: %p\tesi: %p\tedi: %p\n", regs->esp, regs->ebp, regs->esi, regs->edi);
+}
