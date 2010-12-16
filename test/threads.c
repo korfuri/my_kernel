@@ -24,6 +24,7 @@ void thr_printf(char* format, ...) {
 void schedule(void) {
   int old_thread = current_thread;
   if (max_thread == -1) {
+    // FIXME is this even reachable ?!
     panic("Last thread died\n");
   }
   int n = 0;
