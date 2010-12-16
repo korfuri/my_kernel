@@ -75,15 +75,14 @@ void interrupt_handler_14(struct registers regs, unsigned long info, unsigned lo
 }
 
 void interrupt_handler_32(void) {
-  printf("tick\n");
   end_of_interrupt();
   //schedule();
 }
 
 void interrupt_handler_33(void) {
   unsigned char c = inportb(0x60);
-  printf("keyboard ! %d\n", c);
   end_of_interrupt();
+  printf("keyboard ! %d\n", c);
 }
 
 void interrupt_handler_8(void) {

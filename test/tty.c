@@ -1,12 +1,14 @@
 #include <stdarg.h>
 #include <tty.h>
 #include <libC.h>
+#include <mutex.h>
 
 #define COLS 80
 #define LINES 25
 
 static unsigned char* const vram = (unsigned char*)0xb8000;
 static size_t vram_offset = 0;
+static mutex_t tty_m = MUTEX_INIT;
 
 void puts(char* str) {
   putstr(str);
@@ -57,11 +59,14 @@ void putnbr16(uint64_t n) {
 }
 
 void clear_screen(void) {
+  mutex_lock(&tty_m);
   // Resets the whole screen to zero
   memset(vram, 0, COLS * LINES * 2);
+  mutex_unlock(&tty_m);
 }
 
 void putchar(char c) {
+  mutex_lock(&tty_m);
   if (c == '\n') {
     // + COLS * 2 : for line feed
     // - (vram_offset % (COLS * 2)) : for carriage return
@@ -79,6 +84,7 @@ void putchar(char c) {
     vram[(LINES - 1) * COLS * 2] = ' ';
     vram_offset -= COLS * 2;
   }
+  mutex_unlock(&tty_m);
 }
 
 void printf(char* format, ...) {
