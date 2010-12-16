@@ -33,4 +33,12 @@ void idt_flush(void*);
 
 #include <interrupts_handlers.h>
 
+static inline void disable_interrupts(void) {
+  asm volatile("cli");
+}
+
+static inline void enable_interrupts(void) {
+  asm volatile("sti");
+}
+
 #endif

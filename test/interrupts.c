@@ -52,7 +52,7 @@ void interrupts_init(void) {
   idt_set_gates();
   
   idt_flush(&idt_ptr);
-  asm volatile("sti");
+  enable_interrupts();
 }
 
 // Adding interrupt_handler_n here will automatically generate the
@@ -75,13 +75,17 @@ void interrupt_handler_14(struct registers regs, unsigned long info, unsigned lo
 }
 
 void interrupt_handler_32(void) {
+  disable_interrupts();
   end_of_interrupt();
+  enable_interrupts();
   //schedule();
 }
 
 void interrupt_handler_33(void) {
+  disable_interrupts();
   unsigned char c = inportb(0x60);
   end_of_interrupt();
+  enable_interrupts();
   printf("keyboard ! %d\n", c);
 }
 
