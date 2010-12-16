@@ -13,14 +13,14 @@
 void saygoodbye(void* data) {
   for (;;) {
     printf("Saying goodbye %p\n", data);
-    schedule();
+    //schedule();
   }
 }
 
 void sayhello(void* data) {
   for (;;) {
     printf("Saying hello %p\n", data);
-    schedule();
+    //schedule();
   }
 }
 void process_init(void) {
