@@ -28,7 +28,7 @@ void process_init(void) {
   new_thread(saygoodbye, (void*)0x2a2a2a2a);
   new_thread(sayhello, (void*)0x33333333);
   for (;;) {
-    //    asm volatile("hlt");
+    asm volatile("hlt");
     schedule();
   }
 }

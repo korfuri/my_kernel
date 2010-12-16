@@ -9,6 +9,10 @@
 static struct idt_entry idt_entries[IDT_SIZE];
 static struct idt_ptr idt_ptr;
 
+static void end_of_interrupt(void) {
+  outportb(0x20, 0x20);
+}
+
 static void idt_set_gate(uint8_t num, void (*base)(void), uint16_t sel, uint8_t flags) {
   idt_entries[num].base_lo = (uint32_t)base & 0xFFFF;
   idt_entries[num].base_hi = ((uint32_t)base >> 16) & 0xFFFF;
@@ -72,14 +76,14 @@ void interrupt_handler_14(struct registers regs, unsigned long info, unsigned lo
 
 void interrupt_handler_32(void) {
   printf("tick\n");
-  outportb(0x20, 0x20);
+  end_of_interrupt();
   //schedule();
 }
 
 void interrupt_handler_33(void) {
   unsigned char c = inportb(0x60);
   printf("keyboard ! %d\n", c);
-  outportb(0x20, 0x20);
+  end_of_interrupt();
 }
 
 void interrupt_handler_8(void) {
