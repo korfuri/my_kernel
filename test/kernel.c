@@ -8,6 +8,7 @@
 #include <multiboot.h>
 #include <elfkernel.h>
 #include <threads.h>
+#include <ports.h>
 
 void saygoodbye(void* data) {
   for (;;) {
@@ -53,6 +54,12 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
 	 total_free_memory / (1024*1024));
   
   segmentation_init();
+
+  unsigned short divisor = 1193180 / 20;       /* Calculate our divisor */
+  outportb(0x43, 0x36);             /* Set our command byte */
+  outportb(0x40, divisor & 0xFF);   /* Set low byte of divisor */
+  outportb(0x40, divisor >> 8);     /* Set high byte of divisor */
+
   interrupts_init();
   
 
