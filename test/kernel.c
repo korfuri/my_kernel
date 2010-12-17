@@ -11,25 +11,28 @@
 #include <ports.h>
 
 void saygoodbye(void* data) {
+  int i = 0;
   for (;;) {
-    printf("Saying goodbye %p\n", data);
+    printf("Saying goodbye %p %d\n", data, i++);
     schedule();
   }
 }
 
 void sayhello(void* data) {
+  int j = 0;
   for (;;) {
-    printf("Saying hello %p\n", data);
+    printf("Saying hello %p %d\n", data, j++);
     schedule();
   }
 }
 void process_init(void) {
+  enable_interrupts();
   printf("Starting threaded mode...\n");
   new_thread(saygoodbye, (void*)0x2a2a2a2a);
   new_thread(sayhello, (void*)0x33333333);
   for (;;) {
+    enable_interrupts();
     asm volatile("hlt");
-    schedule();
   }
 }
 

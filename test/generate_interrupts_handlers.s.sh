@@ -17,9 +17,13 @@ do
     echo 'global isr'$i
     echo ''
     echo 'isr'$i':'
+    echo '	cli'
+    echo '	pushfd'
     echo '	pushad'
     echo '	call interrupt_handler_'$i
     echo '	popad'
+    echo '	popfd'
+    echo '	sti'
     echo '	iret'
 done
 ) > interrupts_handlers.s

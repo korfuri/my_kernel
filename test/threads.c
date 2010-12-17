@@ -3,6 +3,7 @@
 #include <panic.h>
 #include <kmalloc.h>
 #include <threads.h>
+#include <interrupts.h>
 
 #define MAXPROCS 256
 
@@ -12,6 +13,7 @@ unsigned long new_thread_asm(unsigned long stackbase, void* retpoint, volatile u
 static volatile int current_thread;
 static volatile int max_thread;
 static volatile thread_t threads[MAXPROCS];
+static volatile int scheduling_enabled = 0;
 
 #ifdef THREADS_DEBUG
 #define thr_printf printf
@@ -77,6 +79,8 @@ void start_threads(void (*startfunction)(void*)) {
     threads[i].esp = 0;
     threads[i].pctx = 0;
   }
+  disable_interrupts();
+  scheduling_enabled = 1;
   new_thread(startfunction, NULL);
   schedule();
 }
