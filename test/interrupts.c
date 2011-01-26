@@ -5,6 +5,8 @@
 #include <panic.h>
 #include <registers.h>
 #include <ports.h>
+#include <threads.h>
+#include <keyboard.h>
 
 static struct idt_entry idt_entries[IDT_SIZE];
 static struct idt_ptr idt_ptr;
@@ -81,8 +83,11 @@ void interrupt_handler_32(void) {
 
 void interrupt_handler_33(void) {
   unsigned char c = inportb(0x60);
+  *keyboard_writePtr++ = c;
+  if (keyboard_writePtr > keyboard_buffer + KEYBOARD_BUFFER_SIZE)
+    keyboard_writePtr = keyboard_buffer;
+  unlocked_printf("keyboard ! %d\n", c);
   end_of_interrupt();
-  printf("keyboard ! %d\n", c);
 }
 
 void interrupt_handler_8(void) {
