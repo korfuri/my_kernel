@@ -15,14 +15,6 @@ static volatile int max_thread;
 static volatile thread_t threads[MAXPROCS];
 static volatile int scheduling_enabled = 0;
 
-#ifdef THREADS_DEBUG
-#define thr_printf printf
-#else
-void thr_printf(char* format, ...) {
-  format = 0;
-}
-#endif
-
 void schedule(void) {
   int old_thread = current_thread;
   if (max_thread == -1) {
@@ -64,7 +56,7 @@ static unsigned long thread_new_stack(void) {
   uintptr_t physical = rmm_allocate_page();
   add_identity_paging(current_paging_context_virtual(), current_paging_context_physical(), physical);
   restore_paging_context(current_paging_context_physical());
-  return (unsigned long*)(physical + PAGE_SIZE);
+  return (unsigned long)(physical + PAGE_SIZE);
 }
 
 void new_thread(void (*fct)(void* data), void* data) {

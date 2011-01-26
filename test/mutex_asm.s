@@ -14,6 +14,17 @@ mutex_lock:
 	jmp .loop
 .end:
 	ret
+
+mutex_lock_unscheduled:
+	mov ecx, [esp+4]
+	mov eax, 1
+.loop:
+	xchg [ecx], eax
+	test eax, eax
+	jz .end
+	jmp .loop
+.end:
+	ret
 	
 mutex_unlock:
 	mov ecx, [esp+4]

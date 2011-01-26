@@ -1,6 +1,6 @@
 CFLAGS= -W -Wall -Wstrict-prototypes -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -I. -std=gnu99 -O0
 FIRST_OBJECTS= interrupts_handlers.o
-OBJECTS= $(FIRST_OBJECTS) loader.o interrupts_asm.o segmentation_asm.o kernel.o libC.o tty.o paging.o rmm.o panic.o elfkernel.o interrupts.o segmentation.o kmalloc.o threads.o threads_asm.o trampoline.o mutex_asm.o
+OBJECTS= $(FIRST_OBJECTS) loader.o interrupts_asm.o segmentation_asm.o kernel.o libC.o tty.o paging.o rmm.o panic.o elfkernel.o interrupts.o segmentation.o kmalloc.o threads.o threads_asm.o trampoline.o mutex_asm.o keyboard.o
 LIBGCC=$(shell locate libgcc.a | head -n 1)
 LDFLAGS= -L$(shell dirname $(LIBGCC)) -lgcc
 M= Makefile

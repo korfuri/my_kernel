@@ -9,11 +9,14 @@
 #include <elfkernel.h>
 #include <threads.h>
 #include <ports.h>
+#include <keyboard.h>
 
 void saygoodbye(void* data) {
   int i = 0;
   for (;;) {
-    printf("Saying goodbye %p %d\n", data, i++);
+    if (i % 10 == 0)
+      printf("Saying goodbye %p %d\n", data, i);
+    i++;
     schedule();
   }
 }
@@ -21,7 +24,15 @@ void saygoodbye(void* data) {
 void sayhello(void* data) {
   int j = 0;
   for (;;) {
-    printf("Saying hello %p %d\n", data, j++);
+    if (j % 42 == 0) {
+      char readBuf[256];
+      size_t len = keyboard_read(readBuf, 256);
+      readBuf[len] = '\0';
+      printf(">>> (%d) %s\n", len, readBuf);
+    }
+    if (j % 10 == 0)
+      printf("Saying hello %p %d\n", data, j);
+    j++;
     schedule();
   }
 }
@@ -43,18 +54,18 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
       panic("Wrong multiboot magic");
     }
 
-  clear_screen();
+  unlocked_clear_screen();
 
-  puts("\n\n\t\t\t*** Booting my_kernel ***\n\n");
+  unlocked_puts("\n\n\t\t\t*** Booting my_kernel ***\n\n");
 
 
 
   elf_init((void*)mbi->u.elf_sec.addr, mbi->u.elf_sec.num, mbi->u.elf_sec.shndx);
 
   size_t total_free_memory = rmm_init(mbi);
-  printf("We have %x bytes available (%d MiB)\n",
-	 total_free_memory,
-	 total_free_memory / (1024*1024));
+  unlocked_printf("We have %x bytes available (%d MiB)\n",
+		  total_free_memory,
+		  total_free_memory / (1024*1024));
   
   segmentation_init();
 
@@ -105,6 +116,7 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
 
   paging_context kernel_paging_context = init_paging();
   
+
   start_threads(process_init);
 
   panic("End of kmain()");
