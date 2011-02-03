@@ -9,5 +9,6 @@ extern char	keyboard_buffer[256];
 extern char*	keyboard_readPtr;
 extern char*	keyboard_writePtr;
 size_t keyboard_read(char* buf, size_t len);
+void keyboard_write(unsigned int c);
 
 #endif

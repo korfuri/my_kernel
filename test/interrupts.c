@@ -82,11 +82,8 @@ void interrupt_handler_32(void) {
 }
 
 void interrupt_handler_33(void) {
-  unsigned char c = inportb(0x60);
-  *keyboard_writePtr++ = c;
-  if (keyboard_writePtr > keyboard_buffer + KEYBOARD_BUFFER_SIZE)
-    keyboard_writePtr = keyboard_buffer;
-  unlocked_printf("keyboard ! %d\n", c);
+  unsigned int c = inportb(0x60);
+  keyboard_write(c);
   end_of_interrupt();
 }
 

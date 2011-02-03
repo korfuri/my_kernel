@@ -14,7 +14,7 @@
 void saygoodbye(void* data) {
   int i = 0;
   for (;;) {
-    if (i % 10 == 0)
+    if (i % 40 == 0)
       printf("Saying goodbye %p %d\n", data, i);
     i++;
     schedule();
@@ -30,13 +30,13 @@ void sayhello(void* data) {
       readBuf[len] = '\0';
       printf(">>> (%d) %s\n", len, readBuf);
     }
-    if (j % 10 == 0)
+    if (j % 40 == 0)
       printf("Saying hello %p %d\n", data, j);
     j++;
     schedule();
   }
 }
-void process_init(void) {
+void process_init(void*p) {
   enable_interrupts();
   printf("Starting threaded mode...\n");
   new_thread(saygoodbye, (void*)0x2a2a2a2a);
