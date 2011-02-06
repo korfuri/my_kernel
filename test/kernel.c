@@ -26,8 +26,9 @@ void sayhello(void* data) {
   for (;;) {
     if (j % 42 == 0) {
       char readBuf[256];
-      size_t len = keyboard_read(readBuf, 256);
-      readBuf[len] = '\0';
+      size_t len = keyboard_read(readBuf, 255);
+      readBuf[len] = '$';
+      readBuf[len + 1] = '\0';
       printf(">>> (%d) %s\n", len, readBuf);
     }
     if (j % 40 == 0)
@@ -36,7 +37,7 @@ void sayhello(void* data) {
     schedule();
   }
 }
-void process_init(void*p) {
+void process_init(void* p __attribute__((unused))) {
   enable_interrupts();
   printf("Starting threaded mode...\n");
   new_thread(saygoodbye, (void*)0x2a2a2a2a);
@@ -114,7 +115,7 @@ void kmain(struct multiboot_info* mbi, unsigned int magic)
   //  process_first_sysexit(pid1->esp, pid1->eip);
   //  process_schedule(pid1);
 
-  paging_context kernel_paging_context = init_paging();
+  /* paging_context kernel_paging_context = */ init_paging();
   
 
   start_threads(process_init);
