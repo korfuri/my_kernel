@@ -61,7 +61,7 @@ void interrupts_init(void) {
 // associated ISR and register it at startup.
 
 void interrupt_handler_3(struct registers regs) {
-  printf("Interrupt 3\n");
+  unlocked_printf("Interrupt 3\n");
   dump_regs(&regs);
   backtrace();
 }
