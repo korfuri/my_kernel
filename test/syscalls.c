@@ -14,8 +14,6 @@ static const syscallhandler_t handlers[] = {
 
 static const uint32_t nb_syscalls = sizeof(handlers) / sizeof(handlers[0]);
 
-#define _return(x) do{regs->eax=(x);goto end;}while(0)
-
 #include <tty.h>
 int ksys_write(struct ksys_write_args* args) {
   printf("write: %p %d\n", args->str, args->len);

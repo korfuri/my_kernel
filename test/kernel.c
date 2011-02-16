@@ -17,8 +17,8 @@ void willcrash(void* foo) {
 }
 
 void userthread(void* foo) {
-  sys_write("test\n", 5);
-  sys_blu();
+  printf("%d\n", sys_write("test\n", 5));
+  printf("%d\n", sys_blu());
 }
 
 void saygoodbye(void* data) {
