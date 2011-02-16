@@ -10,14 +10,30 @@
 #include <threads.h>
 #include <ports.h>
 #include <keyboard.h>
+#include <syscalls.h>
+
+void willcrash(void* foo) {
+  *(char*)0xffffff0 = 42;
+}
+
+void userthread(void* foo) {
+  sys_write("test\n", 5);
+  sys_blu();
+}
 
 void saygoodbye(void* data) {
   int i = 0;
   for (;;) {
-    if (i % 40 == 0)
+    if (i % 40 == 0) {
       printf("Saying goodbye %p %d\n", data, i);
+      if (i % 120 == 0) {
+	new_thread(userthread, NULL);
+	//	new_thread(willcrash, NULL);
+      }
+    }
     i++;
-    schedule();
+    //schedule();
+    for (uint32_t sleep = 0; sleep < 10000000; sleep++);
   }
 }
 
@@ -34,7 +50,8 @@ void sayhello(void* data) {
     if (j % 40 == 0)
       printf("Saying hello %p %d\n", data, j);
     j++;
-    schedule();
+    //schedule();
+    for (uint32_t sleep = 0; sleep < 10000000; sleep++);
   }
 }
 void process_init(void* p __attribute__((unused))) {

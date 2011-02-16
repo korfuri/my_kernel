@@ -2,7 +2,6 @@
 #define REGISTERS_H_
 
 struct registers {
-  unsigned long eflags;
   unsigned long edi;
   unsigned long esi;
   unsigned long ebp;
@@ -11,6 +10,7 @@ struct registers {
   unsigned long edx;
   unsigned long ecx;
   unsigned long eax;
+  unsigned long eflags;
 };
 
 #endif

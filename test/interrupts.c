@@ -67,15 +67,19 @@ void interrupt_handler_3(struct registers regs) {
 }
 
 void interrupt_handler_13(void) {
-  panic("General protection fault");
+  panic("General protection fault"); // FIXME this should not panic
+  schedule();
 }
 
 void interrupt_handler_14(struct registers regs, unsigned long info, unsigned long eip) {
   printf("at : %p, info: %p\n", eip, info);
   dump_regs(&regs);
-  panic("Page fault");
+  printf("Page fault");
+  thread_destroy_current();
+  schedule();
 }
 
+// Interrupt 32 is IRQ 0, i.e. the timer
 void interrupt_handler_32(void) {
   end_of_interrupt();
   schedule();
@@ -85,8 +89,17 @@ void interrupt_handler_33(void) {
   unsigned int c = inportb(0x60);
   keyboard_write(c);
   end_of_interrupt();
+  schedule();
+}
+
+void interrupt_handler_128(struct registers regs, unsigned long info, unsigned long eip) {
+  unlocked_printf("Syscall no %d !", regs.eax);
+  dump_regs(&regs);
+  end_of_interrupt();
+  schedule();
 }
 
 void interrupt_handler_8(void) {
   panic("Double fault");
+  schedule();
 }

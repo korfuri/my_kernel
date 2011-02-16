@@ -162,7 +162,7 @@ paging_context init_paging(void) {
   return (paging_context)page_directory;
 }
 
-paging_context fork_paging_context(void) {
+paging_context fork_paging_context(void (*pagemapper)(struct pager*)) {
   // We are going to build a full paging context in
   // alternative_page_directory without leaving the current context,
   // then we will switch to the new context.
@@ -180,6 +180,10 @@ paging_context fork_paging_context(void) {
   add_range_paging_protected(alternative_page_directory, (uintptr_t)page_directory, virtual_to_physical(page_directory, (uintptr_t)alternative_page_directory), CHUNK_SIZE);
   add_range_paging_protected(alternative_page_directory, (uintptr_t)alternative_page_directory, rmm_allocate_chunk(), CHUNK_SIZE);
 
+  // Calls the pagemapper callback to populate the new page directory if needed
+  if (pagemapper)
+    (*pagemapper)(alternative_page_directory);
+  
   // Let's replace our alternative page directory in the old context,
   // we don't want this old context to change it now
   add_range_paging_protected(page_directory, (uintptr_t)alternative_page_directory, rmm_allocate_chunk(), CHUNK_SIZE);

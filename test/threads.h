@@ -26,4 +26,12 @@ void new_thread(void (*fct)(void* data), void* data);
 // calling schedule() at each turn.
 void start_threads(void (*startfunction)(void*));
 
+// Destroys a given thread. It won't be scheduled anymore. This
+// doesn't handle destroying the associated ressources, if any.
+// You should disable interrupts before calling this.
+void thread_destroy(unsigned int thrid);
+
+// Destroys the current thread and calls schedule. This never returns.
+void thread_destroy_current(void);
+
 #endif

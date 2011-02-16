@@ -50,7 +50,7 @@ paging_context init_paging(void);
 // pager and the alternative struct pager.
 // While building the paging_context, the pagemapper callback is
 // called. It is passed the newly created struct pager*.
-paging_context fork_paging_context(void);
+paging_context fork_paging_context(void (*pagemapper)(struct pager*));
 
 // Destroys the current paging context, and switches back to the given
 // paging_context

@@ -39,6 +39,19 @@ void schedule(void) {
   }
 }
 
+void thread_destroy(unsigned int thrid) {
+  threads[thrid].esp = 0;
+  threads[thrid].pctx = 0;
+}
+
+void thread_destroy_current(void) {
+  disable_interrupts();
+  thread_destroy(current_thread);
+  current_thread = -1;
+  enable_interrupts();
+  for (;;) schedule();
+}
+
 void thread_entry(void* old_stack, void (*entry)(void* data), void* data) {
   threads[current_thread].esp = (unsigned long)old_stack;
   max_thread++;
@@ -46,10 +59,8 @@ void thread_entry(void* old_stack, void (*entry)(void* data), void* data) {
   
   (*entry)(data);
 
-  threads[current_thread].esp = 0;
-  threads[current_thread].pctx = 0;
-  current_thread = -1;
-  for (;;) schedule();
+  thread_destroy_current();
+  // not reachable
 }
 
 static unsigned long thread_new_stack(void) {
