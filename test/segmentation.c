@@ -1,5 +1,6 @@
 #include <segmentation.h>
 #include <panic.h>
+#include <tss.h>
 
 #define MAX_GDT_ENTRIES 6
 

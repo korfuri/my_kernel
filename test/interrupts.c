@@ -67,9 +67,13 @@ void interrupt_handler_3(struct registers regs) {
   backtrace();
 }
 
+void interrupt_handler_10(void) {
+  panic("Invalid TSS");
+}
+
 void interrupt_handler_13(void) {
   panic("General protection fault"); // FIXME this should not panic
-  schedule();
+  //schedule();
 }
 
 void interrupt_handler_14(struct registers regs, unsigned long info, unsigned long eip) {

@@ -17,6 +17,8 @@ void willcrash(void* foo) {
 }
 
 void userthread(void* foo) {
+  switch_to_user_mode();
+  printf("OMG USERLAND OMG\n");
   printf("%d\n", sys_write("test\n", 5));
   printf("%d\n", sys_blu());
 }

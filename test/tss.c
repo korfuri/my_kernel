@@ -1,7 +1,7 @@
 #include <tss.h>
 #include <segmentation.h>
 
-struct tss_entry_t tss_entry;
+static struct tss_entry_t tss_entry;
 
 static char tmp_stack[10000];
 static char* tmp_stack_top = tmp_stack + sizeof(tmp_stack) - 1;
@@ -24,7 +24,11 @@ uintptr_t write_tss(void) {
   // sets the RPL (requested privilege level) to 3, meaning that this TSS can be used
   // to switch to kernel mode from ring 3.
   tss_entry.cs = (segment_kernel_code | 3);
-  tss_entry.ss = tss_entry.ds = tss_entry.es = tss_entry.fs = tss_entry.gs = (segment_user_code | 3);
+  tss_entry.ss =
+    tss_entry.ds =
+    tss_entry.es =
+    tss_entry.fs =
+    tss_entry.gs = (segment_kernel_stack | 3);
 
   // Now, add our TSS descriptor's address to the GDT.
   uintptr_t ret = gdt_set_gate(base, limit, 0xE9, 0x00);
