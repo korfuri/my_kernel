@@ -4,6 +4,9 @@
 [EXTERN schedule_C]
 [GLOBAL schedule]
 [EXTERN	current_thread]
+[EXTERN segment_user_stack]
+[EXTERN segment_user_code]
+[GLOBAL switch_to_user_mode]
 	
 new_thread_asm:
 	push ebp
@@ -47,3 +50,29 @@ switch_thread_asm:
 
 	leave
 	ret
+
+switch_to_user_mode:
+	cli
+	xor eax, eax
+	mov ax, [segment_user_stack]
+	or ax, 3
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+
+	push eax			; ss
+	push esp		; esp
+	pushf			; eflags
+
+	pop eax			; modify eflags to enable interrupts
+	or eax, 0x200
+	push eax
+
+	mov eax, [segment_user_code]
+	or ax, 3
+	push eax			; cs
+	push continue
+
+	iret
+continue:

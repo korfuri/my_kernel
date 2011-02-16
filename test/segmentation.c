@@ -47,6 +47,7 @@ void segmentation_init(void) {
   write_tss();
   
   do_gdt_flush();
+  load_tss();
 }
 
 void do_gdt_flush(void) {

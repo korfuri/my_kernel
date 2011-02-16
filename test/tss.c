@@ -17,6 +17,8 @@ uintptr_t write_tss(void) {
   tss_entry.ss0 = segment_kernel_stack; // Set the kernel stack segment.
   tss_entry.esp0 = tmp_stack_top; // Set the kernel stack pointer.
 
+  tss_entry.iomap_base = sizeof(tss_entry); // ?
+  
   // Here we set the cs, ss, ds, es, fs and gs entries in the TSS. These specify what
   // segments should be loaded when the processor switches to kernel mode. Therefore
   // they are just our normal kernel code/data segments - 0x08 and 0x10 respectively,
@@ -34,4 +36,9 @@ uintptr_t write_tss(void) {
   uintptr_t ret = gdt_set_gate(base, limit, 0xE9, 0x00);
 
   return ret;
+}
+
+void load_tss(void) {
+  asm volatile("mov $0x28, %ax");
+  asm volatile("ltr %ax");
 }
