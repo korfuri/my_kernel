@@ -2,15 +2,15 @@
 #define REGISTERS_H_
 
 struct registers {
-  unsigned long edi;
-  unsigned long esi;
-  unsigned long ebp;
-  unsigned long esp;
-  unsigned long ebx;
-  unsigned long edx;
-  unsigned long ecx;
+  const unsigned long edi;
+  const unsigned long esi;
+  const unsigned long ebp;
+  const unsigned long esp;
+  const unsigned long ebx;
+  const unsigned long edx;
+  const unsigned long ecx;
   unsigned long eax;
-  unsigned long eflags;
+  const unsigned long eflags;
 };
 
 #endif

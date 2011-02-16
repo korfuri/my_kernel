@@ -7,6 +7,7 @@
 #include <ports.h>
 #include <threads.h>
 #include <keyboard.h>
+#include <syscalls.h>
 
 static struct idt_entry idt_entries[IDT_SIZE];
 static struct idt_ptr idt_ptr;
@@ -93,9 +94,7 @@ void interrupt_handler_33(void) {
 }
 
 void interrupt_handler_128(struct registers regs, unsigned long info, unsigned long eip) {
-  unlocked_printf("Syscall no %d !", regs.eax);
-  dump_regs(&regs);
-  end_of_interrupt();
+  handle_syscall(&regs);
   schedule();
 }
 

@@ -10,7 +10,7 @@
 #include <threads.h>
 #include <ports.h>
 #include <keyboard.h>
-#include <syscalls.h>
+#include <user/syscalls.h>
 
 void willcrash(void* foo) {
   *(char*)0xffffff0 = 42;
