@@ -43,6 +43,8 @@ void segmentation_init(void) {
   segment_user_code = gdt_set_gate(0, 0xFFFFFFFF, 0xFA, 0xCF); // User mode code segment
   segment_user_stack = gdt_set_gate(0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment
 
+  write_tss();
+  
   do_gdt_flush();
 }
 
