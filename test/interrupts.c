@@ -71,13 +71,30 @@ void interrupt_handler_10(void) {
   panic("Invalid TSS");
 }
 
-void interrupt_handler_13(void) {
-  panic("General protection fault"); // FIXME this should not panic
-  //schedule();
+void interrupt_handler_13(struct registers regs) {
+  backtrace();
+  dump_regs(&regs);
+  printf("General protection fault");
+  thread_destroy_current();
+  schedule();
 }
 
 void interrupt_handler_14(struct registers regs, unsigned long info, unsigned long eip) {
-  printf("at : %p, info: %p\n", eip, info);
+  uintptr_t at;
+  asm volatile("movl %%cr2, %0": "=b"(at));
+  printf("at : %p, info : %d, eip : %p\n", at, info, eip);
+  printf("Error details :\n"
+	 "\tType : %s\n"
+	 "\tRead/Write : %s\n"
+	 "\tUser/Kernel : %s\n"
+	 "\tDue to reserved bits ? : %s\n"
+	 "\tInstruction fetch : %s\n",
+	 (info & PAGEFAULT_IS_PROTECTION_VIOLATION) ? "Protection violation" : "Nonpresent page",
+	 (info & PAGEFAULT_IS_WRITE) ? "Write" : "Read",
+	 (info & PAGEFAULT_IS_FROM_USERMODE) ? "User" : "Kernel",
+	 (info & PAGEFAULT_IS_RESERVEDBITS) ? "Yes" : "No",
+	 (info & PAGEFAULT_IS_INSTRFETCH) ? "Yes" : "No");
+  backtrace();
   dump_regs(&regs);
   printf("Page fault");
   thread_destroy_current();
@@ -97,7 +114,7 @@ void interrupt_handler_33(void) {
   schedule();
 }
 
-void interrupt_handler_128(struct registers regs, unsigned long info, unsigned long eip) {
+void interrupt_handler_128(struct registers regs) {
   handle_syscall(&regs);
   schedule();
 }

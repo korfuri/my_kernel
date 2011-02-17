@@ -41,4 +41,23 @@ static inline void enable_interrupts(void) {
   asm volatile("sti");
 }
 
+// The macros below are to test the error code on a page fault. See
+// the Intel IA-32 manual volume 3A, page 6-55 for further details.
+
+// A page fault is either a protection violation or a non-present page
+#define PAGEFAULT_IS_PROTECTION_VIOLATION 1
+
+// A page fault happens either on a read or on a write
+#define PAGEFAULT_IS_WRITE 2
+
+// A page fault happens either from user or supervisor mode
+#define PAGEFAULT_IS_FROM_USERMODE 4
+
+// A page fault can be due to reserved bits being set in the PDE
+#define PAGEFAULT_IS_RESERVEDBITS 8
+
+// A page fault can happen on an instruction fetch
+#define PAGEFAULT_IS_INSTRFETCH 16
+
+
 #endif
