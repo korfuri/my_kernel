@@ -61,18 +61,20 @@ switch_to_user_mode:
 	mov fs, ax
 	mov gs, ax
 
-	push eax			; ss
+	push eax		; ss
 	push esp		; esp
-	pushf			; eflags
+	pushfd			; eflags
 
 	pop eax			; modify eflags to enable interrupts
 	or eax, 0x200
 	push eax
 
 	mov eax, [segment_user_code]
-	or ax, 3
-	push eax			; cs
-	push continue
-
+	or eax, 3
+	push eax		; cs
+	push .continue		; eip
+	push 0
+	
 	iret
-continue:
+.continue:
+	nop

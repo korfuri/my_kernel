@@ -59,6 +59,8 @@ void thread_entry(void* old_stack, void (*entry)(void* data), void* data) {
   
   (*entry)(data);
 
+  unlocked_printf("Destroying a thread :(\n");
+  
   thread_destroy_current();
   // not reachable
 }
