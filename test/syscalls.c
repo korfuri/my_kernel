@@ -32,7 +32,6 @@ void handle_syscall(struct registers* regs, uintptr_t saved_eip) {
 }
 
 int ksys_write(struct ksys_write_args* args) {
-  printf("foo %p %d\n", args->str, args->len);
   putstrn(args->str, args->len);
   return OK;
 }

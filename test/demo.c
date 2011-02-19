@@ -21,6 +21,7 @@ static void hello(void *p __attribute__((unused))) {
 }
 
 static void crashpf(void *p __attribute__((unused))) {
+  switch_to_user_mode();
   int *i = (int*)0xffffff00;
   *i = 42;
   sys_exit(0);
