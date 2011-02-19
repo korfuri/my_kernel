@@ -29,6 +29,9 @@ void interrupts_init(void);
 // Returns the number of ticks since we started counting
 unsigned int getticks(void);
 
+// Sleeps the thread for n ticks
+void sleep(unsigned int n);
+
 // ASM
 void idt_flush(void*);
 

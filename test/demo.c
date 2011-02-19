@@ -3,15 +3,19 @@
 #include <user/syscalls.h>
 #include <threads.h>
 #include <panic.h>
+#include <tty.h>
+#include <keyboard.h>
+#include <interrupts.h>
 
 static void dots(void *p __attribute__((unused))) {
   for (;;) {
-    sys_write(".", 1);
-    sys_sleep(10);
+    printf(".");
+    sleep(10);
   }
 }
 
 static void hello(void *p __attribute__((unused))) {
+  switch_to_user_mode();
   sys_write("Hello, world !\n", 15);
   sys_exit(42);
 }
@@ -38,7 +42,7 @@ static void exec_command(char* str) {
   } else if (!strcmp(str, "hello")) {
     new_thread(hello, NULL);
   } else {
-    sys_write("Unknown command", 15);
+    printf("Unknown command");
   }
 }
 
@@ -48,12 +52,13 @@ void initsh(void *p __attribute__((unused))) {
 
   memset(cmd, 0, 10);
   for (;;) {
-    sys_write("\ninitsh> ", 9);
+    printf("\ninitsh> ");
     while (!(len == 9 || cmd[len - 1] == '\n')) {
-      if (!sys_read(cmd + len, 1))
-	sys_sleep(1);
+      if (!keyboard_read(cmd + len, 1)) {
+	schedule(); // sys_sleep(1);
+      }
       else {
-	sys_write(cmd + len, 1);
+	putchar(cmd[len]);
 	len++;
       }
     }

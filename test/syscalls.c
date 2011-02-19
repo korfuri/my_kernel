@@ -27,11 +27,12 @@ void handle_syscall(struct registers* regs, uintptr_t saved_eip) {
     regs->eax = EBADSYSCALL;
     return;
   } 
-  uint32_t retVal = (*(handlers[sysnum]))(regs->esp + 20, regs, saved_eip);
+  uint32_t retVal = (*(handlers[sysnum]))(regs->edx + 4, regs, saved_eip);
   regs->eax = retVal;
 }
 
 int ksys_write(struct ksys_write_args* args) {
+  printf("foo %p %d\n", args->str, args->len);
   putstrn(args->str, args->len);
   return OK;
 }
@@ -67,8 +68,6 @@ int ksys_switch_to_user_mode(struct ksys_args_empty* args __attribute__((unused)
 }
 
 int ksys_sleep(struct ksys_sleep_args* args) {
-  unsigned int destinationticks = getticks() + args->ticks;
-  while (getticks() < destinationticks)
-    schedule();
+  sleep(args->ticks);
   return OK;
 }

@@ -104,6 +104,12 @@ void interrupt_handler_14(struct registers regs, unsigned long info, unsigned lo
   schedule(); // unreachable
 }
 
+void sleep(unsigned int n) {
+  unsigned int destinationticks = getticks() + n;
+  while (getticks() < destinationticks)
+    schedule();
+}
+
 // Interrupt 32 is IRQ 0, i.e. the timer
 void interrupt_handler_32(void) {
   ticks++;
