@@ -15,7 +15,7 @@ uintptr_t write_tss(void) {
   memset(&tss_entry, 0, sizeof(tss_entry));
 
   tss_entry.ss0 = segment_kernel_stack; // Set the kernel stack segment.
-  tss_entry.esp0 = tmp_stack_top; // Set the kernel stack pointer.
+  tss_entry.esp0 = (uintptr_t)tmp_stack_top; // Set the kernel stack pointer.
 
   tss_entry.iomap_base = sizeof(tss_entry); // ?
   

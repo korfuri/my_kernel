@@ -11,59 +11,13 @@
 #include <ports.h>
 #include <keyboard.h>
 #include <user/syscalls.h>
+#include <demo.h>
 
-void willcrash(void* foo) {
-  *(char*)0xffffff0 = 42;
-}
 
-void userthread(void* foo) {
-  sys_write("test\n", 5);
-  sys_switch_to_user_mode();
-  sys_write("test\n", 5);
-  printf("OMG USERLAND OMG\n");
-  printf("%d\n", sys_write("test\n", 5));
-  printf("%d\n", sys_blu());
-  sys_exit(0);
-}
-
-void saygoodbye(void* data) {
-  int i = 0;
-  for (;;) {
-    if (i % 40 == 0) {
-      printf("Saying goodbye %p %d\n", data, i);
-      if (i % 120 == 0) {
-	new_thread(userthread, NULL);
-	//	new_thread(willcrash, NULL);
-      }
-    }
-    i++;
-    //schedule();
-    for (uint32_t sleep = 0; sleep < 10000000; sleep++);
-  }
-}
-
-void sayhello(void* data) {
-  int j = 0;
-  for (;;) {
-    if (j % 42 == 0) {
-      char readBuf[256];
-      size_t len = keyboard_read(readBuf, 255);
-      readBuf[len] = '$';
-      readBuf[len + 1] = '\0';
-      printf(">>> (%d) %s\n", len, readBuf);
-    }
-    if (j % 40 == 0)
-      printf("Saying hello %p %d\n", data, j);
-    j++;
-    //schedule();
-    for (uint32_t sleep = 0; sleep < 10000000; sleep++);
-  }
-}
 void process_init(void* p __attribute__((unused))) {
   enable_interrupts();
   printf("Starting threaded mode...\n");
-  new_thread(saygoodbye, (void*)0x2a2a2a2a);
-  new_thread(sayhello, (void*)0x33333333);
+  new_thread(initsh, NULL);
   for (;;) {
     enable_interrupts();
     asm volatile("hlt");

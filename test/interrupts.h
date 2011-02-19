@@ -26,6 +26,9 @@ struct			idt_ptr
 
 void interrupts_init(void);
 
+// Returns the number of ticks since we started counting
+unsigned int getticks(void);
+
 // ASM
 void idt_flush(void*);
 

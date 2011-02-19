@@ -38,5 +38,6 @@ struct tss_entry_t
 } __attribute__((packed));
 
 uintptr_t write_tss(void);
+void load_tss(void);
 
 #endif

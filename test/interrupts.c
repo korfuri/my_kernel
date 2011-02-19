@@ -11,6 +11,7 @@
 
 static struct idt_entry idt_entries[IDT_SIZE];
 static struct idt_ptr idt_ptr;
+static unsigned int ticks = 0;
 
 static void end_of_interrupt(void) {
   outportb(0x20, 0x20);
@@ -58,6 +59,10 @@ void interrupts_init(void) {
   //  enable_interrupts();
 }
 
+unsigned int getticks(void) {
+  return ticks;
+}
+
 // Adding interrupt_handler_n here will automatically generate the
 // associated ISR and register it at startup.
 
@@ -103,7 +108,7 @@ void interrupt_handler_14(struct registers regs, unsigned long info, unsigned lo
 
 // Interrupt 32 is IRQ 0, i.e. the timer
 void interrupt_handler_32(void) {
-  unlocked_putchar('.');
+  ticks++;
   end_of_interrupt();
   schedule();
 }

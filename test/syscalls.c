@@ -2,6 +2,9 @@
 #include <user/errno.h>
 #include <registers.h>
 #include <threads.h>
+#include <keyboard.h>
+#include <interrupts.h>
+#include <tty.h>
 
 typedef int (*syscallhandler_t)();
 
@@ -10,9 +13,10 @@ static int ksys_zero(void* unused __attribute__((unused))) { return 0; }
 static const syscallhandler_t handlers[] = {
   ksys_zero, // 0
   ksys_write, // 1
-  ksys_blu, // 2
+  ksys_read, // 2
   ksys_exit, // 3
-  ksys_switch_to_user_mode // 4
+  ksys_switch_to_user_mode, // 4
+  ksys_sleep // 5
 };
 
 static const uint32_t nb_syscalls = sizeof(handlers) / sizeof(handlers[0]);
@@ -27,19 +31,15 @@ void handle_syscall(struct registers* regs, uintptr_t saved_eip) {
   regs->eax = retVal;
 }
 
-#include <tty.h>
 int ksys_write(struct ksys_write_args* args) {
-  printf("write: %p %d\n", args->str, args->len);
   putstrn(args->str, args->len);
   return OK;
 }
 
-int ksys_blu(struct ksys_args_empty* args __attribute__((unused))) {
-  printf("blu !!!@#\n");
-  volatile int i = 0;
-  for (i = 0; i != 200000000; i++);
-  printf("blu !!!@#\n");
-  return OK;
+int ksys_read(struct ksys_read_args* args) {
+  int len;
+  len = keyboard_read(args->str, args->len);
+  return len;
 }
 
 int ksys_exit(struct ksys_exit_args* args) {
@@ -63,5 +63,12 @@ int ksys_switch_to_user_mode(struct ksys_args_empty* args __attribute__((unused)
   /* stack[3] = regs->esp; // esp */
   /* stack[4] = 0x20 | 0x3; // ss */
   /* apply_usersegment(); */
+  return OK;
+}
+
+int ksys_sleep(struct ksys_sleep_args* args) {
+  unsigned int destinationticks = getticks() + args->ticks;
+  while (getticks() < destinationticks)
+    schedule();
   return OK;
 }
