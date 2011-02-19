@@ -71,10 +71,10 @@ void interrupt_handler_10(void) {
   panic("Invalid TSS");
 }
 
-void interrupt_handler_13(struct registers regs) {
+void interrupt_handler_13(struct registers regs, unsigned long info, unsigned long eip) {
   backtrace();
   dump_regs(&regs);
-  printf("General protection fault");
+  printf("General protection fault [ec=%d] [eip=%p]\n", info, eip);
   thread_destroy_current();
   schedule();
 }
@@ -98,11 +98,12 @@ void interrupt_handler_14(struct registers regs, unsigned long info, unsigned lo
   dump_regs(&regs);
   printf("Page fault");
   thread_destroy_current();
-  schedule();
+  schedule(); // unreachable
 }
 
 // Interrupt 32 is IRQ 0, i.e. the timer
 void interrupt_handler_32(void) {
+  unlocked_putchar('.');
   end_of_interrupt();
   schedule();
 }
@@ -114,8 +115,8 @@ void interrupt_handler_33(void) {
   schedule();
 }
 
-void interrupt_handler_128(struct registers regs) {
-  handle_syscall(&regs);
+void interrupt_handler_128(struct registers regs, uintptr_t eip) {
+  handle_syscall(&regs, eip);
   schedule();
 }
 

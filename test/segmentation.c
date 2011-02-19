@@ -38,11 +38,11 @@ uintptr_t gdt_set_gate(uint32_t base,
 }
 
 void segmentation_init(void) {
-  segment_null = gdt_set_gate(0, 0, 0, 0);                // Null segment
-  segment_kernel_code = gdt_set_gate(0, 0xFFFFFFFF, 0x9A, 0xCF); // Code segment
-  segment_kernel_stack = gdt_set_gate(0, 0xFFFFFFFF, 0x92, 0xCF); // Data segment
-  segment_user_code = gdt_set_gate(0, 0xFFFFFFFF, 0xFA, 0xCF); // User mode code segment
-  segment_user_stack = gdt_set_gate(0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment
+  segment_null = gdt_set_gate(0, 0, 0, 0);                // Null segment = 0x0
+  segment_kernel_code = gdt_set_gate(0, 0xFFFFFFFF, 0x9A, 0xCF); // Code segment = 0x8
+  segment_kernel_stack = gdt_set_gate(0, 0xFFFFFFFF, 0x92, 0xCF); // Data segment = 0x10
+  segment_user_code = gdt_set_gate(0, 0xFFFFFFFF, 0xFA, 0xCF); // User mode code segment = 0x18
+  segment_user_stack = gdt_set_gate(0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment = 0x20
 
   write_tss();
   

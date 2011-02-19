@@ -40,6 +40,7 @@ void schedule(void) {
 }
 
 void thread_destroy(unsigned int thrid) {
+  unlocked_printf("\nKilling thread %d\n", thrid);
   threads[thrid].esp = 0;
   threads[thrid].pctx = 0;
 }

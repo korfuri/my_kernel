@@ -17,10 +17,13 @@ void willcrash(void* foo) {
 }
 
 void userthread(void* foo) {
-  switch_to_user_mode();
+  sys_write("test\n", 5);
+  sys_switch_to_user_mode();
+  sys_write("test\n", 5);
   printf("OMG USERLAND OMG\n");
   printf("%d\n", sys_write("test\n", 5));
   printf("%d\n", sys_blu());
+  sys_exit(0);
 }
 
 void saygoodbye(void* data) {

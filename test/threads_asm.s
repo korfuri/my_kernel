@@ -1,12 +1,11 @@
 [GLOBAL switch_thread_asm]
 [GLOBAL new_thread_asm]
 [EXTERN thread_entry]
-[EXTERN schedule_C]
-[GLOBAL schedule]
 [EXTERN	current_thread]
 [EXTERN segment_user_stack]
 [EXTERN segment_user_code]
-[GLOBAL switch_to_user_mode]
+[GLOBAL switch_to_user_mode_and_return]
+[GLOBAL apply_usersegment]
 	
 new_thread_asm:
 	push ebp
@@ -51,10 +50,10 @@ switch_thread_asm:
 	leave
 	ret
 
-switch_to_user_mode:
+switch_to_user_mode_and_return: ; Takes two parameters : return eip and return esp
 	cli
 	xor eax, eax
-	mov ax, [segment_user_stack]
+	mov eax, 0x20		; segment user data
 	or ax, 3
 	mov ds, ax
 	mov es, ax
@@ -62,19 +61,27 @@ switch_to_user_mode:
 	mov gs, ax
 
 	push eax		; ss
-	push esp		; esp
+	mov eax, [ebp+8]
+	push eax		; esp
 	pushfd			; eflags
 
 	pop eax			; modify eflags to enable interrupts
 	or eax, 0x200
 	push eax
 
-	mov eax, [segment_user_code]
+	mov eax, 0x18		; segment user code
 	or eax, 3
 	push eax		; cs
-	push .continue		; eip
-	push 0
-	
-	iret
-.continue:
-	nop
+	mov eax, [ebp + 4]
+	push eax		; eip
+	iretd
+
+
+apply_usersegment:
+	mov eax, 0x20		; segment user data
+	or ax, 3
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	ret

@@ -20,10 +20,11 @@ do
     echo '	cli'
     echo '	pushfd'
     echo '	pushad'
+#    echo '	push esp'
     echo '	call interrupt_handler_'$i
     echo '	popad'
     echo '	popfd'
-    echo '	sti'
+#    echo '	sti'
     echo '	iret'
 done
 ) > interrupts_handlers.s
