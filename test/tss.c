@@ -25,12 +25,12 @@ uintptr_t write_tss(void) {
   // but with the last two bits set, making 0x0b and 0x13. The setting of these bits
   // sets the RPL (requested privilege level) to 3, meaning that this TSS can be used
   // to switch to kernel mode from ring 3.
-  tss_entry.cs = (segment_kernel_code | 3);
+  tss_entry.cs = 0xb; //(segment_kernel_code | 3);
   tss_entry.ss =
     tss_entry.ds =
     tss_entry.es =
     tss_entry.fs =
-    tss_entry.gs = (segment_kernel_stack | 3);
+    tss_entry.gs = 0x13; // (segment_kernel_stack | 3);
 
   // Now, add our TSS descriptor's address to the GDT.
   uintptr_t ret = gdt_set_gate(base, limit, 0xE9, 0x00);
@@ -39,6 +39,6 @@ uintptr_t write_tss(void) {
 }
 
 void load_tss(void) {
-  asm volatile("mov $0x28, %ax");
+  asm volatile("mov $0x2b, %ax");
   asm volatile("ltr %ax");
 }

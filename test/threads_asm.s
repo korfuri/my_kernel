@@ -4,8 +4,7 @@
 [EXTERN	current_thread]
 [EXTERN segment_user_stack]
 [EXTERN segment_user_code]
-[GLOBAL switch_to_user_mode_and_return]
-[GLOBAL apply_usersegment]
+[GLOBAL switch_to_user_mode]
 	
 new_thread_asm:
 	push ebp
@@ -29,7 +28,7 @@ new_thread_asm:
 
 	push 0			; 4 bytes junk so thread_entry can read its arguments
 	jmp thread_entry
-
+	
 switch_thread_asm:
 	push ebp
 	mov ebp, esp
@@ -50,7 +49,7 @@ switch_thread_asm:
 	leave
 	ret
 
-switch_to_user_mode_and_return: ; Takes two parameters : return eip and return esp
+switch_to_user_mode:
 	cli
 	xor eax, eax
 	mov eax, 0x20		; segment user data
@@ -61,7 +60,8 @@ switch_to_user_mode_and_return: ; Takes two parameters : return eip and return e
 	mov gs, ax
 
 	push eax		; ss
-	mov eax, [ebp+8]
+	mov eax, esp
+	add eax, 4
 	push eax		; esp
 	pushfd			; eflags
 
@@ -72,16 +72,8 @@ switch_to_user_mode_and_return: ; Takes two parameters : return eip and return e
 	mov eax, 0x18		; segment user code
 	or eax, 3
 	push eax		; cs
-	mov eax, [ebp + 4]
-	push eax		; eip
+	push .next		; eip
 	iretd
-
-
-apply_usersegment:
-	mov eax, 0x20		; segment user data
-	or ax, 3
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
+.next:
 	ret
+

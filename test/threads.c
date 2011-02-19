@@ -9,6 +9,7 @@
 
 void switch_thread_asm(void* esp, volatile unsigned long* where_to_save_esp);
 unsigned long new_thread_asm(unsigned long stackbase, void* retpoint, volatile unsigned long* where_to_save_esp, void* data);
+unsigned long new_thread_asm_user(unsigned long stackbase, void* retpoint, volatile unsigned long* where_to_save_esp, void* data);
 
 static volatile int current_thread;
 static volatile int max_thread;

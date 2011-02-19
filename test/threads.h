@@ -34,8 +34,7 @@ void thread_destroy(unsigned int thrid);
 // Destroys the current thread and calls schedule. This never returns.
 void thread_destroy_current(void);
 
-// Switches the current thread to usermode and returns to the provided
-// eip with the provided esp
-void switch_to_user_mode_and_return(uintptr_t eip, uintptr_t esp);
+// Switches the current thread to usermode (ring 3)
+void switch_to_user_mode();
 
 #endif
